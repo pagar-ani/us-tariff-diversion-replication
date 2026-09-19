@@ -1,0 +1,85 @@
+{
+  "baseline_beta": 1.472,
+  "baseline_se_sector": 0.2886,
+  "baseline_se_2way": 0.2862,
+  "mean_loo": 1.4722,
+  "sd_loo": 0.0259,
+  "min_loo": 1.2976,
+  "max_loo": 1.575,
+  "min_sector": "8471",
+  "max_sector": "8510",
+  "p5_loo": 1.4388,
+  "p95_loo": 1.5024,
+  "top10": [
+    {
+      "sector": "8471",
+      "desc": "Computers / Automatic Data Processing Units",
+      "beta_loo": 1.2976,
+      "shift": -0.1744,
+      "pct_shift": -11.85
+    },
+    {
+      "sector": "8510",
+      "desc": "Shavers, hair clippers, hair-removing appliances",
+      "beta_loo": 1.575,
+      "shift": 0.103,
+      "pct_shift": 7.0
+    },
+    {
+      "sector": "8509",
+      "desc": "Electromechanical domestic appliances",
+      "beta_loo": 1.5709,
+      "shift": 0.0989,
+      "pct_shift": 6.72
+    },
+    {
+      "sector": "8513",
+      "desc": "Industrial/Machinery component",
+      "beta_loo": 1.5364,
+      "shift": 0.0644,
+      "pct_shift": 4.37
+    },
+    {
+      "sector": "8528",
+      "desc": "Monitors, projectors, television receivers",
+      "beta_loo": 1.4182,
+      "shift": -0.0538,
+      "pct_shift": -3.66
+    },
+    {
+      "sector": "8505",
+      "desc": "Industrial/Machinery component",
+      "beta_loo": 1.5222,
+      "shift": 0.0501,
+      "pct_shift": 3.41
+    },
+    {
+      "sector": "8541",
+      "desc": "Semiconductor devices, diodes, transistors",
+      "beta_loo": 1.4239,
+      "shift": -0.0482,
+      "pct_shift": -3.27
+    },
+    {
+      "sector": "8485",
+      "desc": "Additive manufacturing machines (3D printers)",
+      "beta_loo": 1.429,
+      "shift": -0.043,
+      "pct_shift": -2.92
+    },
+    {
+      "sector": "8406",
+      "desc": "Industrial/Machinery component",
+      "beta_loo": 1.4301,
+      "shift": -0.0419,
+      "pct_shift": -2.85
+    },
+    {
+      "sector": "8508",
+      "desc": "Industrial/Machinery component",
+      "beta_loo": 1.5127,
+      "shift": 0.0407,
+      "pct_shift": 2.76
+    }
+  ]
+}

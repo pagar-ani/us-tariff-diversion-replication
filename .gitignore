@@ -1,0 +1,16 @@
+# Temporary & cache files
+__pycache__/
+*.py[cod]
+*.class
+*.tmp
+*.temp
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Agent & environment files
+.gemini/
+.agents/
+AGENTS.md
+GEMINI.md

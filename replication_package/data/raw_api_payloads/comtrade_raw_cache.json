@@ -1,0 +1,69 @@
+{
+  "api_endpoint": "https://comtradeapi.un.org/data/v1/get/C/M/HS",
+  "reporter": "704 (Vietnam)",
+  "partner": "842 (USA)",
+  "commodities_queried": [
+    "8517",
+    "851762",
+    "8542",
+    "8516"
+  ],
+  "periods_queried": [
+    "202301",
+    "202306",
+    "202312",
+    "202401",
+    "202406",
+    "202412",
+    "202501",
+    "202502",
+    "202503",
+    "202504",
+    "202505",
+    "202506"
+  ],
+  "fetched_data": {
+    "8517": {
+      "202301": {
+        "primaryValue": 1766020.35,
+        "netWgt": 5901.507,
+        "flowCode": "M",
+        "isReported": false
+      },
+      "202306": {
+        "primaryValue": 5038018.343,
+        "netWgt": 18348.96,
+        "flowCode": "M",
+        "isReported": false
+      },
+      "202312": {
+        "primaryValue": 7906092.728,
+        "netWgt": 21996.804,
+        "flowCode": "M",
+        "isReported": false
+      }
+    },
+    "851762": {
+      "202301": {
+        "primaryValue": 865792.395,
+        "netWgt": 2355.238,
+        "flowCode": "M",
+        "isReported": false
+      },
+      "202306": {
+        "primaryValue": 2468975.976,
+        "netWgt": 6716.42,
+        "flowCode": "M",
+        "isReported": false
+      },
+      "202312": {
+        "primaryValue": 7418437.001,
+        "netWgt": 20180.568,
+        "flowCode": "M",
+        "isReported": false
+      }
+    },
+    "8542": {},
+    "8516": {}
+  }
+}
