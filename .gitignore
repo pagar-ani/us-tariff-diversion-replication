@@ -14,3 +14,10 @@ desktop.ini
 .agents/
 AGENTS.md
 GEMINI.md
+
+# Quarantine manuscripts from GitHub
+MANUSCRIPT.docx
+MANUSCRIPT.md
+MANUSCRIPT.tex
+MANUSCRIPT.pdf
+replication_package/MANUSCRIPT.*
