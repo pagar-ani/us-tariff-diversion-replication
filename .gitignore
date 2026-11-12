@@ -1,23 +1,35 @@
-# Temporary & cache files
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
-*.class
-*.tmp
-*.temp
-*~
+*$py.class
+
+# Temporary and editor files
 .DS_Store
 Thumbs.db
 desktop.ini
+*.swp
+*~
+.vscode/
+.idea/
 
-# Agent & environment files
-.gemini/
-.agents/
-AGENTS.md
-GEMINI.md
+# Environment, hidden files and directories
+.*
+!.gitignore
 
-# Quarantine manuscripts from GitHub
-MANUSCRIPT.docx
-MANUSCRIPT.md
-MANUSCRIPT.tex
-MANUSCRIPT.pdf
-replication_package/MANUSCRIPT.*
+# Manuscript drafts, source files, and build artifacts
+MANUSCRIPT*
+*.docx
+*.tex
+*.pdf
+*.zip
+*.exe
+*.bin
+*.py
+build/
+dist/
+*.tmp
+*.temp
+*.log
+
+# Literature and local reference files
+econre/

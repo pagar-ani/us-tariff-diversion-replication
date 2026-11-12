@@ -8,8 +8,8 @@
   "max_loo": 1.575,
   "min_sector": "8471",
   "max_sector": "8510",
-  "p5_loo": 1.4388,
-  "p95_loo": 1.5024,
+  "p5_loo": 1.4335,
+  "p95_loo": 1.5027,
   "top10": [
     {
       "sector": "8471",
@@ -34,7 +34,7 @@
     },
     {
       "sector": "8513",
-      "desc": "Industrial/Machinery component",
+      "desc": "Portable electric lamps (torches, flashlights)",
       "beta_loo": 1.5364,
       "shift": 0.0644,
       "pct_shift": 4.37
@@ -48,7 +48,7 @@
     },
     {
       "sector": "8505",
-      "desc": "Industrial/Machinery component",
+      "desc": "Electromagnets, permanent magnets, magnetic chucks",
       "beta_loo": 1.5222,
       "shift": 0.0501,
       "pct_shift": 3.41
@@ -69,14 +69,14 @@
     },
     {
       "sector": "8406",
-      "desc": "Industrial/Machinery component",
+      "desc": "Steam turbines and other vapour turbines",
       "beta_loo": 1.4301,
       "shift": -0.0419,
       "pct_shift": -2.85
     },
     {
       "sector": "8508",
-      "desc": "Industrial/Machinery component",
+      "desc": "Vacuum cleaners and parts thereof",
       "beta_loo": 1.5127,
       "shift": 0.0407,
       "pct_shift": 2.76

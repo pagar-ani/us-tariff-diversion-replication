@@ -1,8 +1,9 @@
-----------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
       name:  <unnamed>
-       log:  C:\Users\Zer0\Desktop\dd\final\replication_package\data\stata\../../results/multilateral_hs84_hs85_log.txt
+       log:  c:\Users\Zer0\Desktop\dd\replication_package\data\stata\../../results/multila
+> teral_hs84_hs85_log.txt
   log type:  text
- opened on:  19 Sep 2026, 00:15:38
+ opened on:  13 Nov 2026, 02:43:58
 
 . 
 . di _newline "========================================================================"
@@ -15,18 +16,20 @@ PART 0: VERIFY SSC PACKAGES & COMPILE MATA LIBS
 . di "========================================================================"
 ========================================================================
 
-. foreach pkg in ftools reghdfe {
+. foreach pkg in require ftools reghdfe ppmlhdfe {
   2.     cap which `pkg'
   3.     if _rc {
   4.         di "Installing `pkg' from SSC..."
-  5.         ssc install `pkg', replace
+  5.         cap ssc install `pkg', replace
   6.     }
   7.     else {
   8.         di "`pkg' is already installed."
   9.     }
  10. }
+require is already installed.
 ftools is already installed.
 reghdfe is already installed.
+ppmlhdfe is already installed.
 
 . cap ftools, compile
 
@@ -39,8 +42,8 @@ reghdfe is already installed.
 
 ========================================================================
 
-. di "PART 1: LOAD FULL UNIVERSE DATASET & VERIFY INVARIANTS"
-PART 1: LOAD FULL UNIVERSE DATASET & VERIFY INVARIANTS
+. di "PART 1: LOAD FULL UNIVERSE DATASET & VERIFY PANEL STRUCTURE"
+PART 1: LOAD FULL UNIVERSE DATASET & VERIFY PANEL STRUCTURE
 
 . di "========================================================================"
 ========================================================================
@@ -48,7 +51,7 @@ PART 1: LOAD FULL UNIVERSE DATASET & VERIFY INVARIANTS
 . use "panel_hs84_hs85_full_universe.dta", clear
 
 . 
-. * Auto-heal trade_value_m_usd and net_mass_mt if missing or in raw units
+. * Derive trade_value_m_usd and net_mass_mt if in raw units
 . cap confirm variable trade_value_m_usd
 
 . if _rc != 0 {
@@ -86,8 +89,8 @@ PART 1: LOAD FULL UNIVERSE DATASET & VERIFY INVARIANTS
 
 . 
 . * Immediately purge any derived variables that might exist from previous runs/saves
-. foreach v in log_val ex_china treat_ex_china treat_ex_china_2022 partner_sector sector_period partner_period density log_density early
-> _post late_post {
+. foreach v in log_val ex_china treat_ex_china treat_ex_china_2022 partner_sector sector_p
+> eriod partner_period density log_density early_post late_post {
   2.     cap drop `v'
   3. }
 
@@ -96,150 +99,26 @@ PART 1: LOAD FULL UNIVERSE DATASET & VERIFY INVARIANTS
 . cap drop ev_*
 
 . 
-. * Check if china_share_2022 exists; if not, construct it automatically
-. cap confirm variable china_share_2022
+. * Exogenous 2022 baseline China share merge
+. cap drop china_share_2022
 
-. if _rc != 0 {
-.     di as txt "Constructing china_share_2022 directly across all 133 sectors..."
-.     gen double china_share_2022 = 0.0
-.     qui replace china_share_2022 = 0.001362 if sector == "8401"
-.     qui replace china_share_2022 = 0.204746 if sector == "8402"
-.     qui replace china_share_2022 = 0.069118 if sector == "8403"
-.     qui replace china_share_2022 = 0.220320 if sector == "8404"
-.     qui replace china_share_2022 = 0.007326 if sector == "8405"
-.     qui replace china_share_2022 = 0.013277 if sector == "8406"
-.     qui replace china_share_2022 = 0.038839 if sector == "8407"
-.     qui replace china_share_2022 = 0.016834 if sector == "8408"
-.     qui replace china_share_2022 = 0.133044 if sector == "8409"
-.     qui replace china_share_2022 = 0.131667 if sector == "8410"
-.     qui replace china_share_2022 = 0.013738 if sector == "8411"
-.     qui replace china_share_2022 = 0.139400 if sector == "8412"
-.     qui replace china_share_2022 = 0.181888 if sector == "8413"
-.     qui replace china_share_2022 = 0.291094 if sector == "8414"
-.     qui replace china_share_2022 = 0.251250 if sector == "8415"
-.     qui replace china_share_2022 = 0.208828 if sector == "8416"
-.     qui replace china_share_2022 = 0.047134 if sector == "8417"
-.     qui replace china_share_2022 = 0.226028 if sector == "8418"
-.     qui replace china_share_2022 = 0.139011 if sector == "8419"
-.     qui replace china_share_2022 = 0.282176 if sector == "8420"
-.     qui replace china_share_2022 = 0.135534 if sector == "8421"
-.     qui replace china_share_2022 = 0.096666 if sector == "8422"
-.     qui replace china_share_2022 = 0.374949 if sector == "8423"
-.     qui replace china_share_2022 = 0.319682 if sector == "8424"
-.     qui replace china_share_2022 = 0.582066 if sector == "8425"
-.     qui replace china_share_2022 = 0.068950 if sector == "8426"
-.     qui replace china_share_2022 = 0.175373 if sector == "8427"
-.     qui replace china_share_2022 = 0.053047 if sector == "8428"
-.     qui replace china_share_2022 = 0.065241 if sector == "8429"
-.     qui replace china_share_2022 = 0.122416 if sector == "8430"
-.     qui replace china_share_2022 = 0.227717 if sector == "8431"
-.     qui replace china_share_2022 = 0.124529 if sector == "8432"
-.     qui replace china_share_2022 = 0.222105 if sector == "8433"
-.     qui replace china_share_2022 = 0.035582 if sector == "8434"
-.     qui replace china_share_2022 = 0.189425 if sector == "8435"
-.     qui replace china_share_2022 = 0.075620 if sector == "8436"
-.     qui replace china_share_2022 = 0.096698 if sector == "8437"
-.     qui replace china_share_2022 = 0.081651 if sector == "8438"
-.     qui replace china_share_2022 = 0.078618 if sector == "8439"
-.     qui replace china_share_2022 = 0.258066 if sector == "8440"
-.     qui replace china_share_2022 = 0.095639 if sector == "8441"
-.     qui replace china_share_2022 = 0.090980 if sector == "8442"
-.     qui replace china_share_2022 = 0.166263 if sector == "8443"
-.     qui replace china_share_2022 = 0.148527 if sector == "8444"
-.     qui replace china_share_2022 = 0.022711 if sector == "8445"
-.     qui replace china_share_2022 = 0.020847 if sector == "8446"
-.     qui replace china_share_2022 = 0.157277 if sector == "8447"
-.     qui replace china_share_2022 = 0.063877 if sector == "8448"
-.     qui replace china_share_2022 = 0.137597 if sector == "8449"
-.     qui replace china_share_2022 = 0.222977 if sector == "8450"
-.     qui replace china_share_2022 = 0.056004 if sector == "8451"
-.     qui replace china_share_2022 = 0.180513 if sector == "8452"
-.     qui replace china_share_2022 = 0.077495 if sector == "8453"
-.     qui replace china_share_2022 = 0.143467 if sector == "8454"
-.     qui replace china_share_2022 = 0.101119 if sector == "8455"
-.     qui replace china_share_2022 = 0.084216 if sector == "8456"
-.     qui replace china_share_2022 = 0.003902 if sector == "8457"
-.     qui replace china_share_2022 = 0.021602 if sector == "8458"
-.     qui replace china_share_2022 = 0.119796 if sector == "8459"
-.     qui replace china_share_2022 = 0.054263 if sector == "8460"
-.     qui replace china_share_2022 = 0.102343 if sector == "8461"
-.     qui replace china_share_2022 = 0.054741 if sector == "8462"
-.     qui replace china_share_2022 = 0.063994 if sector == "8463"
-.     qui replace china_share_2022 = 0.231972 if sector == "8464"
-.     qui replace china_share_2022 = 0.284957 if sector == "8465"
-.     qui replace china_share_2022 = 0.104923 if sector == "8466"
-.     qui replace china_share_2022 = 0.443847 if sector == "8467"
-.     qui replace china_share_2022 = 0.186455 if sector == "8468"
-.     qui replace china_share_2022 = 0.308052 if sector == "8470"
-.     qui replace china_share_2022 = 0.450441 if sector == "8471"
-.     qui replace china_share_2022 = 0.165287 if sector == "8472"
-.     qui replace china_share_2022 = 0.209347 if sector == "8473"
-.     qui replace china_share_2022 = 0.110977 if sector == "8474"
-.     qui replace china_share_2022 = 0.025213 if sector == "8475"
-.     qui replace china_share_2022 = 0.276661 if sector == "8476"
-.     qui replace china_share_2022 = 0.087378 if sector == "8477"
-.     qui replace china_share_2022 = 0.100810 if sector == "8478"
-.     qui replace china_share_2022 = 0.116116 if sector == "8479"
-.     qui replace china_share_2022 = 0.174614 if sector == "8480"
-.     qui replace china_share_2022 = 0.243959 if sector == "8481"
-.     qui replace china_share_2022 = 0.187632 if sector == "8482"
-.     qui replace china_share_2022 = 0.173828 if sector == "8483"
-.     qui replace china_share_2022 = 0.091329 if sector == "8484"
-.     qui replace china_share_2022 = 0.081848 if sector == "8485"
-.     qui replace china_share_2022 = 0.063995 if sector == "8486"
-.     qui replace china_share_2022 = 0.076404 if sector == "8487"
-.     qui replace china_share_2022 = 0.162154 if sector == "8501"
-.     qui replace china_share_2022 = 0.308297 if sector == "8502"
-.     qui replace china_share_2022 = 0.171938 if sector == "8503"
-.     qui replace china_share_2022 = 0.224950 if sector == "8504"
-.     qui replace china_share_2022 = 0.522000 if sector == "8505"
-.     qui replace china_share_2022 = 0.342774 if sector == "8506"
-.     qui replace china_share_2022 = 0.456795 if sector == "8507"
-.     qui replace china_share_2022 = 0.469465 if sector == "8508"
-.     qui replace china_share_2022 = 0.818215 if sector == "8509"
-.     qui replace china_share_2022 = 0.507591 if sector == "8510"
-.     qui replace china_share_2022 = 0.145021 if sector == "8511"
-.     qui replace china_share_2022 = 0.090619 if sector == "8512"
-.     qui replace china_share_2022 = 0.956456 if sector == "8513"
-.     qui replace china_share_2022 = 0.075509 if sector == "8514"
-.     qui replace china_share_2022 = 0.101437 if sector == "8515"
-.     qui replace china_share_2022 = 0.575674 if sector == "8516"
-.     qui replace china_share_2022 = 0.508369 if sector == "8517"
-.     qui replace china_share_2022 = 0.455103 if sector == "8518"
-.     qui replace china_share_2022 = 0.743680 if sector == "8519"
-.     qui replace china_share_2022 = 0.353741 if sector == "8521"
-.     qui replace china_share_2022 = 0.221387 if sector == "8522"
-.     qui replace china_share_2022 = 0.037261 if sector == "8523"
-.     qui replace china_share_2022 = 0.395620 if sector == "8524"
-.     qui replace china_share_2022 = 0.277012 if sector == "8525"
-.     qui replace china_share_2022 = 0.218815 if sector == "8526"
-.     qui replace china_share_2022 = 0.164739 if sector == "8527"
-.     qui replace china_share_2022 = 0.378462 if sector == "8528"
-.     qui replace china_share_2022 = 0.180024 if sector == "8529"
-.     qui replace china_share_2022 = 0.102395 if sector == "8530"
-.     qui replace china_share_2022 = 0.264259 if sector == "8531"
-.     qui replace china_share_2022 = 0.260493 if sector == "8532"
-.     qui replace china_share_2022 = 0.135261 if sector == "8533"
-.     qui replace china_share_2022 = 0.336589 if sector == "8534"
-.     qui replace china_share_2022 = 0.092403 if sector == "8535"
-.     qui replace china_share_2022 = 0.202667 if sector == "8536"
-.     qui replace china_share_2022 = 0.101151 if sector == "8537"
-.     qui replace china_share_2022 = 0.149572 if sector == "8538"
-.     qui replace china_share_2022 = 0.745875 if sector == "8539"
-.     qui replace china_share_2022 = 0.075201 if sector == "8540"
-.     qui replace china_share_2022 = 0.059852 if sector == "8541"
-.     qui replace china_share_2022 = 0.059818 if sector == "8542"
-.     qui replace china_share_2022 = 0.181216 if sector == "8543"
-.     qui replace china_share_2022 = 0.138414 if sector == "8544"
-.     qui replace china_share_2022 = 0.124268 if sector == "8545"
-.     qui replace china_share_2022 = 0.328853 if sector == "8546"
-.     qui replace china_share_2022 = 0.277253 if sector == "8547"
-.     qui replace china_share_2022 = 0.164570 if sector == "8548"
-.     di as res "[VERIFIED] china_share_2022 constructed for 133 sectors."
-. }
+. merge m:1 sector using "baseline_china_share_2022.dta", keepusing(china_share_2022)
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                            25,624  (_merge==3)
+    -----------------------------------------
+
+. keep if _merge == 3
+(0 observations deleted)
+
+. drop _merge
+
+. confirm variable china_share_2022
 
 . 
-. * Invariant verification
+. * Panel dimension verification
 . qui levelsof period, local(periods)
 
 . local n_periods : word count `periods'
@@ -264,13 +143,16 @@ PART 1: LOAD FULL UNIVERSE DATASET & VERIFY INVARIANTS
 . di as txt "Total Observations in Panel (N):     " as res _N
 Total Observations in Panel (N):     25624
 
-. di as txt "Total Active 4-Digit Sectors:         " as res `n_sectors' " (HS Chapters 84 & 85)"
+. di as txt "Total Active 4-Digit Sectors:         " as res `n_sectors' " (HS Chapters 84 
+> & 85)"
 Total Active 4-Digit Sectors:         133 (HS Chapters 84 & 85)
 
-. di as txt "Total Trading Partners:               " as res `n_partners' " (CHN, TWN, MEX, VNM, THA, IND)"
+. di as txt "Total Trading Partners:               " as res `n_partners' " (CHN, TWN, MEX,
+>  VNM, THA, IND)"
 Total Trading Partners:               6 (CHN, TWN, MEX, VNM, THA, IND)
 
-. di as txt "Total Consecutive Calendar Months:    " as res `n_periods' " (2023M01 - 2025M12)"
+. di as txt "Total Consecutive Calendar Months:    " as res `n_periods' " (2023M01 - 2025M
+> 12)"
 Total Consecutive Calendar Months:    36 (2023M01 - 2025M12)
 
 . di as txt "Pre-Tariff Months (2023M01-2025M03):  " as res `n_pre'
@@ -292,8 +174,9 @@ Post-Tariff Months (2025M04-2025M12): 9
 
 . assert _N == 25624
 
-. di as res "[VERIFIED] All panel invariants match the administrative customs declarations."
-[VERIFIED] All panel invariants match the administrative customs declarations.
+. di as txt "Panel dimensions verified: 133 sectors, 6 partners, 36 months (25,624 observa
+> tions)."
+Panel dimensions verified: 133 sectors, 6 partners, 36 months (25,624 observations).
 
 . 
 . di _newline "========================================================================"
@@ -333,11 +216,13 @@ xij variables:
 .     gen double pct_growth = (abs_diff / pre_val) * 100
 
 . 
-.     di as txt _newline "Exporter / Partner | Pre ($M/mo) | Post ($M/mo) | Diff ($M/mo) | Growth (%)"
+.     di as txt _newline "Exporter / Partner | Pre (\$M/mo) | Post (\$M/mo) | Diff (\$M/mo
+> ) | Growth (%)"
 
-Exporter / Partner | Pre (/mo) | Post (/mo) | Diff (/mo) | Growth (%)
+Exporter / Partner | Pre ($M/mo) | Post ($M/mo) | Diff ($M/mo) | Growth (%)
 
-.     di as txt "-------------------+--------------+---------------+--------------+-----------"
+.     di as txt "-------------------+--------------+---------------+--------------+-------
+> ----"
 -------------------+--------------+---------------+--------------+-----------
 
 .     foreach p in CHN TWN MEX VNM THA IND {
@@ -349,7 +234,8 @@ Exporter / Partner | Pre (/mo) | Post (/mo) | Diff (/mo) | Growth (%)
   7.         local diff = r(mean)
   8.         qui summ pct_growth if partner_iso == "`p'"
   9.         local pct = r(mean)
- 10.         di as res %-18s "`p'" " | " %12.2f `pre' " | " %13.2f `post' " | " %12.2f `diff' " | " %9.2f `pct' "%"
+ 10.         di as res %-18s "`p'" " | " %12.2f `pre' " | " %13.2f `post' " | " %12.2f `di
+> ff' " | " %9.2f `pct' "%"
  11.     }
 CHN                |     17541.69 |       9714.92 |     -7826.77 |    -44.62%
 TWN                |      6647.52 |      16637.92 |      9990.40 |    150.29%
@@ -372,15 +258,75 @@ IND                |      1823.50 |       3241.88 |      1418.38 |     77.78%
 
 .     local pct_tot = (`diff_tot' / `pre_tot') * 100
 
-.     di as txt "-------------------+--------------+---------------+--------------+-----------"
+.     di as txt "-------------------+--------------+---------------+--------------+-------
+> ----"
 -------------------+--------------+---------------+--------------+-----------
 
-.     di as res %-18s "Ex-China Combined" " | " %12.2f `pre_tot' " | " %13.2f `post_tot' " | " %12.2f `diff_tot' " | " %9.2f `pct_tot' "
-> %"
+.     di as res %-18s "Ex-China Combined" " | " %12.2f `pre_tot' " | " %13.2f `post_tot' "
+>  | " %12.2f `diff_tot' " | " %9.2f `pct_tot' "%"
 Ex-China Combined  |     32632.08 |      57267.94 |     24635.86 |     75.50%
 
-.     di as txt "============================================================================="
+.     di as txt "=========================================================================
+> ===="
 =============================================================================
+
+. restore
+
+. 
+. * Live Aggregation for Appendix Table A2 (Monthly Bilateral Trade Trajectory)
+. preserve
+
+.     keep if period >= 202410
+(14,881 observations deleted)
+
+.     gen byte is_ex_chn = (partner_iso != "CHN")
+
+.     collapse (sum) trade_value_m_usd, by(period is_ex_chn)
+
+.     reshape wide trade_value_m_usd, i(period) j(is_ex_chn)
+(j = 0 1)
+
+Data                               Long   ->   Wide
+-----------------------------------------------------------------------------
+Number of observations               30   ->   15          
+Number of variables                   3   ->   3           
+j variable (2 values)         is_ex_chn   ->   (dropped)
+xij variables:
+                      trade_value_m_usd   ->   trade_value_m_usd0 trade_value_m_usd1
+-----------------------------------------------------------------------------
+
+.     rename trade_value_m_usd0 chn_m_usd
+
+.     rename trade_value_m_usd1 ex_chn_m_usd
+
+.     gen double ratio_ex_chn = ex_chn_m_usd / chn_m_usd
+
+.     di _newline ">>> APPENDIX TABLE A2: MONTHLY BILATERAL TRADE TRAJECTORY (2024M10–2025
+> M12) <<<"
+
+>>> APPENDIX TABLE A2: MONTHLY BILATERAL TRADE TRAJECTORY (2024M10–2025M12) <<<
+
+.     list period chn_m_usd ex_chn_m_usd ratio_ex_chn, sep(0) noobs
+
+  +--------------------------------------------+
+  | period   chn_m_usd   ex_chn_~d   ratio_e~n |
+  |--------------------------------------------|
+  | 202410   21311.024   39130.957   1.8361838 |
+  | 202411    19310.37     35269.4   1.8264487 |
+  | 202412    18228.64   35162.408    1.928965 |
+  | 202501   20147.451   38427.658   1.9073211 |
+  | 202502   14369.503   38179.482   2.6569799 |
+  | 202503   14355.513   47734.239   3.3251503 |
+  | 202504   11452.177   47841.542   4.1775063 |
+  | 202505   8602.5109   52739.622   6.1307242 |
+  | 202506   7529.5138    54749.87   7.2713686 |
+  | 202507   10461.088   57997.733   5.5441396 |
+  | 202508   9679.1498   54436.911   5.6241418 |
+  | 202509   10506.919   53159.594   5.0594847 |
+  | 202510   10878.054    65607.21   6.0311533 |
+  | 202511   9277.0572   62206.864   6.7054522 |
+  | 202512   9047.8415   66672.126   7.3688432 |
+  +--------------------------------------------+
 
 . restore
 
@@ -396,21 +342,30 @@ PART 3: LIVE REPLICATION OF TABLE 2 (MULTI-ESTIMATOR ROBUSTNESS SUITE)
 ========================================================================
 
 . 
-. * Check for ppmlhdfe
-. cap which ppmlhdfe
-
-. if _rc {
-.     di "Installing ppmlhdfe from SSC..."
-.     cap ssc install ppmlhdfe, replace
-. }
-
-. 
 . * Generate variables using exogenous 2022 baseline share
-. foreach v in log_val ex_china treat_ex_china_2022 treat_ex_china partner_sector sector_period partner_period {
+. foreach v in log_val ex_china treat_ex_china_2022 treat_ex_china partner_sector sector_p
+> eriod partner_period {
   2.     cap drop `v'
   3. }
 
-. gen double log_val = ln(max(trade_value_m_usd, 0.001))
+. * Clean positive flow log transformation without arbitrary floor
+. cap confirm variable trade_value_m_usd
+
+. if _rc != 0 {
+.     cap confirm variable val_usd
+.     if _rc == 0 gen double trade_value_m_usd = val_usd / 1000000
+.     else {
+.         cap confirm variable trade_value_usd
+.         if _rc == 0 gen double trade_value_m_usd = trade_value_usd / 1000000
+.         else {
+.             cap confirm variable primaryvalue
+.             if _rc == 0 gen double trade_value_m_usd = primaryvalue / 1000000
+.         }
+.     }
+. }
+
+. gen double log_val = ln(trade_value_m_usd) if trade_value_m_usd > 0 & !missing(trade_val
+> ue_m_usd)
 
 . gen byte ex_china = (partner_iso != "CHN")
 
@@ -426,11 +381,13 @@ PART 3: LIVE REPLICATION OF TABLE 2 (MULTI-ESTIMATOR ROBUSTNESS SUITE)
 . egen partner_period = group(partner_iso period)
 
 . 
-. di _newline ">>> COLUMN 1: Baseline Multilateral OLS (2022 Exogenous Share, Sector Cluster) <<<"
+. di _newline ">>> COLUMN 1: Baseline Multilateral OLS (2022 Exogenous Share, Sector Clust
+> er) <<<"
 
 >>> COLUMN 1: Baseline Multilateral OLS (2022 Exogenous Share, Sector Cluster) <<<
 
-. reghdfe log_val treat_ex_china_2022, absorb(partner_sector sector_period partner_period) vce(cluster sector)
+. reghdfe log_val treat_ex_china_2022, absorb(partner_sector sector_period partner_period)
+>  vce(cluster sector)
 (dropped 80 singleton observations)
 (MWFE estimator converged in 12 iterations)
 
@@ -467,7 +424,7 @@ Absorbed degrees of freedom:
 
 . local t_col1 = `b_col1' / `se_col1'
 
-. local p_col1 = 2 * (1 - normal(abs(`t_col1')))
+. local p_col1 = 2 * ttail(e(df_r), abs(`t_col1'))
 
 . di as txt "OLS Estimate (beta):     " as res %7.4f `b_col1'
 OLS Estimate (beta):      1.4720
@@ -475,18 +432,25 @@ OLS Estimate (beta):      1.4720
 . di as txt "Sector Cluster SE:       " as res %7.4f `se_col1'
 Sector Cluster SE:        0.2886
 
-. di as txt "t-statistic / p-value:   t = " as res %5.2f `t_col1' as txt ", p = " as res %6.4f `p_col1'
+. di as txt "t-statistic / p-value:   t = " as res %5.2f `t_col1' as txt ", p = " as res %
+> 6.4f `p_col1'
 t-statistic / p-value:   t =  5.10, p = 0.0000
 
+. di as txt "R-squared (Total / Within): Total R2 = " as res %6.4f e(r2) as txt ", Within 
+> R2 = " as res %6.4f e(r2_within) as txt " (absorbing 5,695 FE categories)"
+R-squared (Total / Within): Total R2 = 0.9519, Within R2 = 0.0045 (absorbing 5,695 FE cate
+> gories)
+
 . 
-. di _newline ">>> COLUMN 1 (ROBUSTNESS): Two-Way Clustered Standard Errors (Country x Sector) <<<"
+. di _newline ">>> COLUMN 1 (ROBUSTNESS): Two-Way Clustered Standard Errors (Country x Sec
+> tor) <<<"
 
 >>> COLUMN 1 (ROBUSTNESS): Two-Way Clustered Standard Errors (Country x Sector) <<<
 
-. reghdfe log_val treat_ex_china_2022, absorb(partner_sector sector_period partner_period) vce(cluster partner_iso sector)
+. reghdfe log_val treat_ex_china_2022, absorb(partner_sector sector_period partner_period)
+>  vce(cluster partner_iso sector)
 (dropped 80 singleton observations)
 (MWFE estimator converged in 12 iterations)
-Warning: VCV matrix was non-positive semi-definite; adjustment from Cameron, Gelbach & Miller applied.
 
 HDFE Linear regression                            Number of obs   =     25,544
 Absorbing 3 HDFE groups                           F(   1,      5) =      26.46
@@ -519,13 +483,30 @@ Absorbed degrees of freedom:
 Two-Way Cluster SE:       0.2862
 
 . 
-. di _newline ">>> COLUMN 2: High-Dimensional PPML on Trade Levels (True Zeros Balanced Panel, N = 28,353) <<<"
+. di _newline ">>> COLUMN 2: High-Dimensional PPML on Trade Levels (True Zeros Balanced Pa
+> nel, N = 28,353) <<<"
 
->>> COLUMN 2: High-Dimensional PPML on Trade Levels (True Zeros Balanced Panel, N = 28,353) <<<
+>>> COLUMN 2: High-Dimensional PPML on Trade Levels (True Zeros Balanced Panel, N = 28,353
+> ) <<<
 
 . preserve
 
 .     use "panel_hs84_hs85_balanced_with_zeros.dta", clear
+
+.     cap drop china_share_2022
+
+.     merge m:1 sector using "baseline_china_share_2022.dta", keepusing(china_share_2022)
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                            28,728  (_merge==3)
+    -----------------------------------------
+
+.     keep if _merge == 3
+(0 observations deleted)
+
+.     drop _merge
 
 .     gen byte ex_china_b = (partner_iso != "CHN")
 
@@ -540,58 +521,72 @@ Two-Way Cluster SE:       0.2862
 .     egen partner_period_b = group(partner_iso period)
 
 .     
-.     cap ppmlhdfe trade_value_m_usd treat_ex_china_2022_b, absorb(partner_sector_b sector_period_b partner_period_b) vce(cluster sector
-> )
+.     cap ppmlhdfe trade_value_m_usd treat_ex_china_2022_b, absorb(partner_sector_b sector
+> _period_b partner_period_b) vce(cluster sector)
 
 .     if _rc == 0 {
 .         di as txt "PPML Estimate (beta):    " as res %7.4f _b[treat_ex_china_2022_b]
 PPML Estimate (beta):     3.2629
 .         di as txt "Sector Cluster SE:       " as res %7.4f _se[treat_ex_china_2022_b]
 Sector Cluster SE:        1.1738
-.         di as txt "p-value:                 " as res %6.4f 2*(1-normal(abs(_b[treat_ex_china_2022_b]/_se[treat_ex_china_2022_b])))
+.         di as txt "p-value:                 " as res %6.4f 2*(1 - normal(abs(_b[treat_ex
+> _china_2022_b]/_se[treat_ex_china_2022_b])))
 p-value:                 0.0054
-.         cap ppmlhdfe trade_value_m_usd treat_ex_china_2022_b, absorb(partner_sector_b sector_period_b partner_period_b) vce(cluster pa
-> rtner_iso sector)
+.         cap ppmlhdfe trade_value_m_usd treat_ex_china_2022_b, absorb(partner_sector_b se
+> ctor_period_b partner_period_b) vce(cluster partner_iso sector)
 .         if _rc == 0 {
-.             di as txt "Two-Way Cluster SE:      " as res %7.4f _se[treat_ex_china_2022_b]
+.             di as txt "Two-Way Cluster SE:      " as res %7.4f _se[treat_ex_china_2022_b
+> ]
 Two-Way Cluster SE:       0.8850
 .         }
-.     }
-
-.     else {
-.         di as txt "Note: ppmlhdfe verified via Python pyfixest fepois (N = 28,353, beta = 3.2616, SE = 1.1750, p = 0.0055; Two-Way SE 
-> = 0.8850, p_t5 = 0.0143)."
 .     }
 
 . restore
 
 . 
-. di _newline ">>> COLUMN 3: Comparative RDiT Statutory Enforcement Step Jump (July 1, 2025) <<<"
+. di _newline ">>> COLUMN 3: Comparative RDiT Statutory Enforcement Step Jump <<<"
 
->>> COLUMN 3: Comparative RDiT Statutory Enforcement Step Jump (July 1, 2025) <<<
+>>> COLUMN 3: Comparative RDiT Statutory Enforcement Step Jump <<<
 
-. di as txt "Estimated via Hausman & Rapson (2018) spline in 02_hausman_rapson_rdit_splines.do:"
+. di as txt "Estimated via Hausman & Rapson (2018) spline in 02_hausman_rapson_rdit_spline
+> s.do:"
 Estimated via Hausman & Rapson (2018) spline in 02_hausman_rapson_rdit_splines.do:
 
-. di as txt "  OLS Step Jump (delta):    beta = 1.3673 (SE = 0.2980, t = 4.59, p < 0.0001; Two-Way SE = 0.2562, p_t5 = 0.0031, N = 25,54
-> 4)"
-  OLS Step Jump (delta):    beta = 1.3673 (SE = 0.2980, t = 4.59, p < 0.0001; Two-Way SE = 0.2562, p_t5 = 0.0031, N = 25,544)
+. di as txt "  OLS Step Jump (delta):    beta = 1.3673 (SE = 0.2980, t = 4.59, p < 0.0001;
+>  Two-Way SE = 0.2562, p_t5 = 0.0031, N = 25,544)"
+  OLS Step Jump (delta):    beta = 1.3673 (SE = 0.2980, t = 4.59, p < 0.0001; Two-Way SE =
+>  0.2562, p_t5 = 0.0031, N = 25,544)
 
-. di as txt "  PPML Step Jump (delta):   beta = 2.6259 (SE = 0.6075, t = 4.32, p < 0.0001; Two-Way SE = 0.3993, p_t5 = 0.0012, N = 28,35
-> 3)"
-  PPML Step Jump (delta):   beta = 2.6259 (SE = 0.6075, t = 4.32, p < 0.0001; Two-Way SE = 0.3993, p_t5 = 0.0012, N = 28,353)
-
-. di as txt "  (Note: Replaces single exploratory in-time placebo with full dynamic spline identification)"
-  (Note: Replaces single exploratory in-time placebo with full dynamic spline identification)
+. di as txt "  PPML Step Jump (delta):   beta = 2.6259 (SE = 0.6052, z = 4.34, p < 0.0001;
+>  Two-Way SE = 0.4101, p_t5 = 0.0014, N = 28,353)"
+  PPML Step Jump (delta):   beta = 2.6259 (SE = 0.6052, z = 4.34, p < 0.0001; Two-Way SE =
+>  0.4101, p_t5 = 0.0014, N = 28,353)
 
 . 
-. di _newline ">>> COLUMN 4: Non-Technology PPML (True Zeros Balanced Panel, Excl. HS 8471 & HS 8517, N = 27,921) <<<"
+. di _newline ">>> COLUMN 4: Non-Technology PPML (True Zeros Balanced Panel, Excl. HS 8471
+>  & HS 8517, N = 27,921) <<<"
 
->>> COLUMN 4: Non-Technology PPML (True Zeros Balanced Panel, Excl. HS 8471 & HS 8517, N = 27,921) <<<
+>>> COLUMN 4: Non-Technology PPML (True Zeros Balanced Panel, Excl. HS 8471 & HS 8517, N =
+>  27,921) <<<
 
 . preserve
 
 .     use "panel_hs84_hs85_balanced_with_zeros.dta", clear
+
+.     cap drop china_share_2022
+
+.     merge m:1 sector using "baseline_china_share_2022.dta", keepusing(china_share_2022)
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                            28,728  (_merge==3)
+    -----------------------------------------
+
+.     keep if _merge == 3
+(0 observations deleted)
+
+.     drop _merge
 
 .     drop if inlist(sector, "8471", "8517")
 (432 observations deleted)
@@ -609,34 +604,31 @@ Estimated via Hausman & Rapson (2018) spline in 02_hausman_rapson_rdit_splines.d
 .     egen partner_period_b = group(partner_iso period)
 
 .     
-.     cap ppmlhdfe trade_value_m_usd treat_ex_china_2022_b, absorb(partner_sector_b sector_period_b partner_period_b) vce(cluster sector
-> )
+.     cap ppmlhdfe trade_value_m_usd treat_ex_china_2022_b, absorb(partner_sector_b sector
+> _period_b partner_period_b) vce(cluster sector)
 
 .     if _rc == 0 {
 .         di as txt "Non-Tech PPML (beta):    " as res %7.4f _b[treat_ex_china_2022_b]
 Non-Tech PPML (beta):     1.2095
 .         di as txt "Sector Cluster SE:       " as res %7.4f _se[treat_ex_china_2022_b]
 Sector Cluster SE:        0.3103
-.         di as txt "p-value:                 " as res %6.4f 2*(1-normal(abs(_b[treat_ex_china_2022_b]/_se[treat_ex_china_2022_b])))
+.         di as txt "p-value:                 " as res %6.4f 2*(1 - normal(abs(_b[treat_ex
+> _china_2022_b]/_se[treat_ex_china_2022_b])))
 p-value:                 0.0001
-.         cap ppmlhdfe trade_value_m_usd treat_ex_china_2022_b, absorb(partner_sector_b sector_period_b partner_period_b) vce(cluster pa
-> rtner_iso sector)
+.         cap ppmlhdfe trade_value_m_usd treat_ex_china_2022_b, absorb(partner_sector_b se
+> ctor_period_b partner_period_b) vce(cluster partner_iso sector)
 .         if _rc == 0 {
-.             di as txt "Two-Way Cluster SE:      " as res %7.4f _se[treat_ex_china_2022_b]
+.             di as txt "Two-Way Cluster SE:      " as res %7.4f _se[treat_ex_china_2022_b
+> ]
 Two-Way Cluster SE:       0.3187
 .         }
-.     }
-
-.     else {
-.         di as txt "Note: Non-Tech PPML verified via Python pyfixest fepois (N = 27,921, beta = 1.2095, SE = 0.3115, p = 0.0001; Two-Wa
-> y SE = 0.3187, p_t5 = 0.0128)."
-.         di as txt "      Estimating on positive flows only yields beta = 1.2033 (SE = 0.3116, N = 25,112)."
 .     }
 
 . restore
 
 . 
-. di _newline ">>> PARTNER-SPECIFIC REALLOCATION DECOMPOSITION (beta_k relative to China) <<<"
+. di _newline ">>> PARTNER-SPECIFIC REALLOCATION DECOMPOSITION (beta_k relative to China) 
+> <<<"
 
 >>> PARTNER-SPECIFIC REALLOCATION DECOMPOSITION (beta_k relative to China) <<<
 
@@ -645,8 +637,8 @@ Two-Way Cluster SE:       0.3187
   3.     gen double treat_`p'_2022 = (partner_iso == "`p'") * china_share_2022 * post
   4. }
 
-. reghdfe log_val treat_TWN_2022 treat_MEX_2022 treat_VNM_2022 treat_THA_2022 treat_IND_2022, absorb(partner_sector sector_period partne
-> r_period) vce(cluster sector)
+. reghdfe log_val treat_TWN_2022 treat_MEX_2022 treat_VNM_2022 treat_THA_2022 treat_IND_20
+> 22, absorb(partner_sector sector_period partner_period) vce(cluster sector)
 (dropped 80 singleton observations)
 (MWFE estimator converged in 12 iterations)
 
@@ -685,26 +677,29 @@ Absorbed degrees of freedom:
 Partner-Specific OLS Elasticities (identified relative to CHN reference):
 
 . foreach p in TWN MEX VNM THA IND {
-  2.     di as txt "  `p': beta = " as res %7.4f _b[treat_`p'_2022] " (p = " as res %6.4f 2*(1-normal(abs(_b[treat_`p'_2022]/_se[treat_`
-> p'_2022]))) as txt ")"
+  2.     di as txt "  `p': beta = " as res %7.4f _b[treat_`p'_2022] " (p = " as res %6.4f 
+> 2*ttail(e(df_r), abs(_b[treat_`p'_2022]/_se[treat_`p'_2022])) as txt ")"
   3. }
-  TWN: beta =  0.9369 (p = 0.0109)
-  MEX: beta =  1.2631 (p = 0.0113)
+  TWN: beta =  0.9369 (p = 0.0120)
+  MEX: beta =  1.2631 (p = 0.0124)
   VNM: beta =  1.5447 (p = 0.0000)
   THA: beta =  2.7515 (p = 0.0000)
-  IND: beta =  1.0209 (p = 0.0455)
+  IND: beta =  1.0209 (p = 0.0476)
 
 . 
-. di _newline ">>> BROAD NON-DATACENTER INFRASTRUCTURE EXCLUSION (Excl. 8471, 8517, 8504, 8536, 8537, 8544) <<<"
+. di _newline ">>> BROAD NON-DATACENTER INFRASTRUCTURE EXCLUSION (Excl. 8471, 8517, 8504, 
+> 8536, 8537, 8544) <<<"
 
->>> BROAD NON-DATACENTER INFRASTRUCTURE EXCLUSION (Excl. 8471, 8517, 8504, 8536, 8537, 8544) <<<
+>>> BROAD NON-DATACENTER INFRASTRUCTURE EXCLUSION (Excl. 8471, 8517, 8504, 8536, 8537, 854
+> 4) <<<
 
 . preserve
 
 .     drop if inlist(sector, "8471", "8517", "8504", "8536", "8537", "8544")
 (1,296 observations deleted)
 
-.     reghdfe log_val treat_ex_china_2022, absorb(partner_sector sector_period partner_period) vce(cluster sector)
+.     reghdfe log_val treat_ex_china_2022, absorb(partner_sector sector_period partner_per
+> iod) vce(cluster sector)
 (dropped 80 singleton observations)
 (MWFE estimator converged in 12 iterations)
 
@@ -735,8 +730,9 @@ Absorbed degrees of freedom:
 --------------------------------------------------------+
 * = FE nested within cluster; treated as redundant for DoF computation
 
-.     di as txt "Broad Non-Datacenter OLS (127 Sectors): beta = " as res %7.4f _b[treat_ex_china_2022] " (p = " as res %6.4f 2*(1-normal
-> (abs(_b[treat_ex_china_2022]/_se[treat_ex_china_2022]))) as txt ")"
+.     di as txt "Broad Non-Datacenter OLS (127 Sectors): beta = " as res %7.4f _b[treat_ex
+> _china_2022] " (p = " as res %6.4f 2*ttail(e(df_r), abs(_b[treat_ex_china_2022]/_se[trea
+> t_ex_china_2022])) as txt ")"
 Broad Non-Datacenter OLS (127 Sectors): beta =  1.2474 (p = 0.0000)
 
 . restore
@@ -752,17 +748,20 @@ PART 4: LEAVE-ONE-OUT (LOO) JACKKNIFE STABILITY (133 ITERATIONS, 2022 BASELINE)
 . di "========================================================================"
 ========================================================================
 
+. * The LOO jackknife clusters by sector and reports empirical percentiles
 . qui levelsof sector, local(all_s)
 
 . tempname memhold
 
 . tempfile loo_res
 
-. postfile `memhold' str4 dropped_sector double b_loo using `loo_res'
+. postfile `memhold' str4 dropped_sector double (b_loo se_loo t_loo) using `loo_res'
 
 . 
-. di as txt "Running 133 Leave-One-Out iterations across full machinery & electronics universe (2022 Share)..."
-Running 133 Leave-One-Out iterations across full machinery & electronics universe (2022 Share)...
+. di as txt "Running 133 Leave-One-Out iterations across full machinery & electronics univ
+> erse (2022 Share)..."
+Running 133 Leave-One-Out iterations across full machinery & electronics universe (2022 Sh
+> are)...
 
 . qui foreach s of local all_s {
 
@@ -798,7 +797,11 @@ Running 133 Leave-One-Out iterations across full machinery & electronics univers
 
 .     local loo_max = r(max)
 
-.     local loo_p5 = r(p5)
+.     local loo_p10 = r(p10)
+
+.     local loo_p90 = r(p90)
+
+.     local loo_p5  = r(p5)
 
 .     local loo_p95 = r(p95)
 
@@ -813,11 +816,31 @@ Leave-One-Out (LOO) Empirical Distribution across 133 Sectors:
 .     di as txt "  Standard Deviation (sigma):" as res %7.4f `loo_sd'
   Standard Deviation (sigma): 0.0259
 
-.     di as txt "  Empirical Range:           [" as res %7.4f `loo_min' as txt ", " as res %7.4f `loo_max' as txt "]"
+.     di as txt "  Empirical Range:           [" as res %7.4f `loo_min' as txt ", " as res
+>  %7.4f `loo_max' as txt "]"
   Empirical Range:           [ 1.2976,  1.5750]
 
-.     di as txt "  90% Empirical Interval:    [" as res %7.4f `loo_p5' as txt ", " as res %7.4f `loo_p95' as txt "]"
+.     di as txt "  80% Empirical Interval:    [" as res %7.4f `loo_p10' as txt ", " as res
+>  %7.4f `loo_p90' as txt "]"
+  80% Empirical Interval:    [ 1.4512,  1.4931]
+
+.     di as txt "  90% Empirical Interval:    [" as res %7.4f `loo_p5' as txt ", " as res 
+> %7.4f `loo_p95' as txt "]"
   90% Empirical Interval:    [ 1.4335,  1.5027]
+
+.     
+.     di as txt _newline "HS 8541 Drop (Semiconductors):"
+
+HS 8541 Drop (Semiconductors):
+
+.     list dropped_sector b_loo se_loo t_loo if dropped_sector == "8541", noobs
+
+  +----------------------------------------------+
+  | droppe~r       b_loo      se_loo       t_loo |
+  |----------------------------------------------|
+  |     8541   1.4238705   .28353805   5.0217969 |
+  +----------------------------------------------+
+
 
 .     
 .     gen double swing = abs(b_loo - `b_col1')
@@ -847,8 +870,8 @@ Top 5 Most Influential Heading Drops:
 
 ========================================================================
 
-. di "PART 5: PHYSICAL SHIPPING DENSITY INVARIANCE (kg/$M)"
-PART 5: PHYSICAL SHIPPING DENSITY INVARIANCE (kg/)
+. di "PART 5: PHYSICAL SHIPPING DENSITY TEST (kg/\$M)"
+PART 5: PHYSICAL SHIPPING DENSITY TEST (kg/$M)
 
 . di "========================================================================"
 ========================================================================
@@ -863,15 +886,15 @@ PART 5: PHYSICAL SHIPPING DENSITY INVARIANCE (kg/)
 (2,698 missing values generated)
 
 . 
-. di _newline ">>> SPECIFICATION 5A: Full Universe Machinery & Electronics Density Test <<<"
+. di _newline ">>> SPECIFICATION 5A: Full Universe Machinery & Electronics Density Test <<
+> <"
 
 >>> SPECIFICATION 5A: Full Universe Machinery & Electronics Density Test <<<
 
-. * Absorbs partner_sector fixed effects (avoids absorbing post via partner_period)
-. reghdfe log_density post if ex_china == 1, absorb(partner_sector) vce(cluster partner_iso sector)
+. reghdfe log_density post if ex_china == 1, absorb(partner_sector) vce(cluster partner_is
+> o sector)
 (dropped 14 singleton observations)
 (MWFE estimator converged in 1 iterations)
-Warning: VCV matrix was non-positive semi-definite; adjustment from Cameron, Gelbach & Miller applied.
 
 HDFE Linear regression                            Number of obs   =     18,529
 Absorbing 1 HDFE group                            F(   1,      4) =       0.69
@@ -898,19 +921,23 @@ Absorbed degrees of freedom:
 --------------------------------------------------------+
 * = FE nested within cluster; treated as redundant for DoF computation
 
-. di as txt "Universe Density Elasticity:  beta = " as res %7.4f _b[post] as txt " (SE = " as res %7.4f _se[post] as txt ", p = " as res
->  %6.4f 2*(1-normal(abs(_b[post]/_se[post]))) as txt ")"
-Universe Density Elasticity:  beta =  0.0114 (SE =  0.0137, p = 0.4059)
+. di as txt "Universe Density Elasticity:  beta = " as res %7.4f _b[post] as txt " (SE = "
+>  as res %7.4f _se[post] as txt ", p = " as res %6.4f 2*ttail(e(df_r), abs(_b[post]/_se[p
+> ost])) as txt ")"
+Universe Density Elasticity:  beta =  0.0114 (SE =  0.0137, p = 0.4526)
 
 . 
-. di _newline ">>> SPECIFICATION 5B: Saturated Continuous DiD on Density (HS 84 & 85 Universe) <<<"
+. di _newline ">>> SPECIFICATION 5B: Saturated Continuous DiD on Density (HS 84 & 85 Unive
+> rse) <<<"
 
 >>> SPECIFICATION 5B: Saturated Continuous DiD on Density (HS 84 & 85 Universe) <<<
 
-. * Continuous treatment varies across sectors, safely estimated with saturated 3-way FE
-. reghdfe log_density treat_ex_china_2022, absorb(partner_sector sector_period partner_period) vce(cluster partner_iso sector)
+. reghdfe log_density treat_ex_china_2022, absorb(partner_sector sector_period partner_per
+> iod) vce(cluster partner_iso sector)
 (dropped 162 singleton observations)
 (MWFE estimator converged in 12 iterations)
+Warning: VCV matrix was non-positive semi-definite; adjustment from Cameron, Gelbach & Mil
+> ler applied.
 
 HDFE Linear regression                            Number of obs   =     22,764
 Absorbing 3 HDFE groups                           F(   1,      5) =       2.47
@@ -939,62 +966,69 @@ Absorbed degrees of freedom:
 --------------------------------------------------------+
 * = FE nested within cluster; treated as redundant for DoF computation
 
-. di as txt "Continuous Density Elasticity: beta = " as res %7.4f _b[treat_ex_china_2022] as txt " (SE = " as res %7.4f _se[treat_ex_chi
-> na_2022] as txt ", p = " as res %6.4f 2*(1-normal(abs(_b[treat_ex_china_2022]/_se[treat_ex_china_2022]))) as txt ")"
-Continuous Density Elasticity: beta = -0.1181 (SE =  0.0752, p = 0.1160)
+. di as txt "Continuous Density Elasticity: beta = " as res %7.4f _b[treat_ex_china_2022] 
+> as txt " (SE = " as res %7.4f _se[treat_ex_china_2022] as txt ", p = " as res %6.4f 2*tt
+> ail(e(df_r), abs(_b[treat_ex_china_2022]/_se[treat_ex_china_2022])) as txt ")"
+Continuous Density Elasticity: beta = -0.1181 (SE =  0.0752, p = 0.1768)
 
 . 
-. di _newline ">>> SPECIFICATION 5C: Focal Telecom Hardware (HS 8517) Density Invariance <<<"
+. di _newline ">>> SPECIFICATION 5C: Focal Telecom Hardware (HS 8517) Density Invariance <
+> <<"
 
 >>> SPECIFICATION 5C: Focal Telecom Hardware (HS 8517) Density Invariance <<<
 
 . preserve
 
-.     cap confirm file "panel_8517_sdid.dta"
+.     keep if sector == "8517" & ex_china == 1
+(25,444 observations deleted)
 
-.     if _rc == 0 {
-.         use "panel_8517_sdid.dta", clear
-.         reghdfe log_density treat_post, absorb(partner_id period_id) vce(cluster partner_id)
-(MWFE estimator converged in 2 iterations)
+.     reghdfe log_density post, absorb(partner_iso) vce(cluster partner_iso)
+(MWFE estimator converged in 1 iterations)
 
-HDFE Linear regression                            Number of obs   =        396
-Absorbing 2 HDFE groups                           F(   1,     10) =       0.91
-Statistics robust to heteroskedasticity           Prob > F        =     0.3631
-                                                  R-squared       =     0.6940
-                                                  Adj R-squared   =     0.6537
-                                                  Within R-sq.    =     0.0014
-Number of clusters (partner_id) =         11      Root MSE        =     0.2695
+HDFE Linear regression                            Number of obs   =        180
+Absorbing 1 HDFE group                            F(   1,      4) =       0.91
+Statistics robust to heteroskedasticity           Prob > F        =     0.3932
+                                                  R-squared       =     0.8074
+                                                  Adj R-squared   =     0.8019
+                                                  Within R-sq.    =     0.0433
+Number of clusters (partner_iso) =          5     Root MSE        =     0.2164
 
-                            (Std. err. adjusted for 11 clusters in partner_id)
+                            (Std. err. adjusted for 5 clusters in partner_iso)
 ------------------------------------------------------------------------------
              |               Robust
  log_density | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-  treat_post |  -.0765164   .0802889    -0.95   0.363    -.2554111    .1023784
-       _cons |   7.968947   .0018247  4367.15   0.000     7.964881    7.973013
+        post |  -.1045233   .1093244    -0.96   0.393    -.4080566      .19901
+       _cons |   1.045581   .0273311    38.26   0.000     .9696972    1.121464
 ------------------------------------------------------------------------------
 
 Absorbed degrees of freedom:
 -----------------------------------------------------+
  Absorbed FE | Categories  - Redundant  = Num. Coefs |
 -------------+---------------------------------------|
-  partner_id |        11          11           0    *|
-   period_id |        36           1          35     |
+ partner_iso |         5           5           0    *|
 -----------------------------------------------------+
 * = FE nested within cluster; treated as redundant for DoF computation
-.         local b_focal = _b[treat_post]
-.         local se_focal = _se[treat_post]
-.         local t_focal = `b_focal' / `se_focal'
-.         local p_focal = 2 * (1 - normal(abs(`t_focal')))
-.         di as txt "Focal Telecom (8517) Density theta: " as res %7.4f `b_focal' as txt " (SE = " as res %7.4f `se_focal' as txt ", t =
->  " as res %5.2f `t_focal' as txt ", p = " as res %6.4f `p_focal' as txt ")"
-Focal Telecom (8517) Density theta: -0.0765 (SE =  0.0803, t = -0.95, p = 0.3406)
-.     }
+
+.     local b_focal = _b[post]
+
+.     local se_focal = _se[post]
+
+.     local t_focal = `b_focal' / `se_focal'
+
+.     local p_focal = 2 * ttail(e(df_r), abs(`t_focal'))
+
+.     di as txt "Focal Telecom (8517) Density theta: " as res %7.4f `b_focal' as txt " (SE
+>  = " as res %7.4f `se_focal' as txt ", t = " as res %5.2f `t_focal' as txt ", p = " as r
+> es %6.4f `p_focal' as txt ")"
+Focal Telecom (8517) Density theta: -0.1045 (SE =  0.1093, t = -0.96, p = 0.3932)
 
 . restore
 
-. di as txt "[VERIFIED] Physical mass expanded proportionally with customs value (p > 0.10 null across all specifications)."
-[VERIFIED] Physical mass expanded proportionally with customs value (p > 0.10 null across all specifications).
+. di as txt "Physical density regression fails to reject proportional mass expansion (p > 
+> 0.10 across specifications; wide CI precludes ruling out modest composition shifts)."
+Physical density regression fails to reject proportional mass expansion (p > 0.10 across s
+> pecifications; wide CI precludes ruling out modest composition shifts).
 
 . 
 . di _newline "========================================================================"
@@ -1007,12 +1041,15 @@ PART 6: DYNAMIC 36-MONTH EVENT STUDY & JOINT PRE-TREND WALD TEST
 . di "========================================================================"
 ========================================================================
 
-. * Reference period: 2025M03 (month immediately prior to April 2 EO 14257)
 . qui levelsof period, local(all_periods)
 
 . local pre_vars ""
 
 . local post_vars ""
+
+. local pre_sum ""
+
+. local post_sum ""
 
 . 
 . foreach p of local all_periods {
@@ -1021,18 +1058,23 @@ PART 6: DYNAMIC 36-MONTH EVENT STUDY & JOINT PRE-TREND WALD TEST
   4.         gen double ev_`p' = ex_china * china_share_2022 * (period == `p')
   5.         if `p' < 202503 {
   6.             local pre_vars "`pre_vars' ev_`p'"
-  7.         }
-  8.         else {
-  9.             local post_vars "`post_vars' ev_`p'"
- 10.         }
- 11.     }
- 12. }
+  7.             if "`pre_sum'" == "" local pre_sum "ev_`p'"
+  8.             else local pre_sum "`pre_sum' + ev_`p'"
+  9.         }
+ 10.         else {
+ 11.             local post_vars "`post_vars' ev_`p'"
+ 12.             if "`post_sum'" == "" local post_sum "ev_`p'"
+ 13.             else local post_sum "`post_sum' + ev_`p'"
+ 14.         }
+ 15.     }
+ 16. }
 
 . 
 . di as txt "Estimating full 35-month dynamic event study (26 leads, 9 lags)..."
 Estimating full 35-month dynamic event study (26 leads, 9 lags)...
 
-. reghdfe log_val `pre_vars' `post_vars', absorb(partner_sector sector_period partner_period) vce(cluster sector)
+. reghdfe log_val `pre_vars' `post_vars', absorb(partner_sector sector_period partner_peri
+> od) vce(cluster sector)
 (dropped 80 singleton observations)
 (MWFE estimator converged in 12 iterations)
 
@@ -1140,7 +1182,8 @@ Absorbed degrees of freedom:
 
 . local df_r = r(df_r)
 
-. di as txt "Joint Pre-Trend F-stat: F(26, `df_r') = " as res %7.4f `f_stat' as txt ", p = " as res %6.4f `p_val'
+. di as txt "Joint Pre-Trend F-stat: F(26, `df_r') = " as res %7.4f `f_stat' as txt ", p =
+>  " as res %6.4f `p_val'
 Joint Pre-Trend F-stat: F(26, 132) =  2.0550, p = 0.0044
 
 . 
@@ -1152,26 +1195,362 @@ Post-Treatment Monthly Estimates (April - Dec 2025):
   2.     local p_num = substr("`v'", 4, .)
   3.     local b_v = _b[`v']
   4.     local se_v = _se[`v']
-  5.     local p_v = 2 * (1 - normal(abs(`b_v' / `se_v')))
-  6.     di as txt "  Period `p_num': beta = " as res %7.4f `b_v' as txt " (SE = " as res %7.4f `se_v' as txt ", p = " as res %6.4f `p_v
-> ' as txt ")"
+  5.     local p_v = 2 * ttail(e(df_r), abs(`b_v' / `se_v'))
+  6.     di as txt "  Period `p_num': beta = " as res %7.4f `b_v' as txt " (SE = " as res 
+> %7.4f `se_v' as txt ", p = " as res %6.4f `p_v' as txt ")"
   7. }
-  Period 202504: beta =  0.1906 (SE =  0.3253, p = 0.5581)
-  Period 202505: beta =  0.1760 (SE =  0.3139, p = 0.5751)
-  Period 202506: beta =  0.6762 (SE =  0.4152, p = 0.1034)
-  Period 202507: beta =  1.1055 (SE =  0.3681, p = 0.0027)
-  Period 202508: beta =  0.3616 (SE =  0.4450, p = 0.4165)
-  Period 202509: beta =  1.0747 (SE =  0.5125, p = 0.0360)
-  Period 202510: beta =  0.8346 (SE =  0.4526, p = 0.0652)
-  Period 202511: beta =  1.1125 (SE =  0.5033, p = 0.0271)
-  Period 202512: beta =  1.0573 (SE =  0.4827, p = 0.0285)
+  Period 202504: beta =  0.1906 (SE =  0.3253, p = 0.5591)
+  Period 202505: beta =  0.1760 (SE =  0.3139, p = 0.5760)
+  Period 202506: beta =  0.6762 (SE =  0.4152, p = 0.1058)
+  Period 202507: beta =  1.1055 (SE =  0.3681, p = 0.0032)
+  Period 202508: beta =  0.3616 (SE =  0.4450, p = 0.4180)
+  Period 202509: beta =  1.0747 (SE =  0.5125, p = 0.0379)
+  Period 202510: beta =  0.8346 (SE =  0.4526, p = 0.0674)
+  Period 202511: beta =  1.1125 (SE =  0.5033, p = 0.0288)
+  Period 202512: beta =  1.0573 (SE =  0.4827, p = 0.0302)
 
 . 
-. di as txt _newline ">>> CLEAN PRE-TREATMENT BASELINE TESTS (2023-2024 HORIZON) <<<"
+. di as txt _newline ">>> TABLE 4 PANEL A: DYNAMIC EVENT-STUDY WINDOW ESTIMATES (27 PRE-PE
+> RIOD MONTHS) <<<"
 
->>> CLEAN PRE-TREATMENT BASELINE TESTS (2023-2024 HORIZON) <<<
+>>> TABLE 4 PANEL A: DYNAMIC EVENT-STUDY WINDOW ESTIMATES (27 PRE-PERIOD MONTHS) <<<
 
-. * Window equality test (2023 vs 2024 annual windows)
+. * Pre-treatment mean across all 27 pre-period months (including reference month 2025M03 
+> where beta = 0)
+. lincom (`pre_sum') / 27
+
+ ( 1)  .037037*ev_202301 + .037037*ev_202302 + .037037*ev_202303 + .037037*ev_202304 +
+       .037037*ev_202305 + .037037*ev_202306 + .037037*ev_202307 + .037037*ev_202308 +
+       .037037*ev_202309 + .037037*ev_202310 + .037037*ev_202311 + .037037*ev_202312 +
+       .037037*ev_202401 + .037037*ev_202402 + .037037*ev_202403 + .037037*ev_202404 +
+       .037037*ev_202405 + .037037*ev_202406 + .037037*ev_202407 + .037037*ev_202408 +
+       .037037*ev_202409 + .037037*ev_202410 + .037037*ev_202411 + .037037*ev_202412 +
+       .037037*ev_202501 + .037037*ev_202502 = 0
+
+------------------------------------------------------------------------------
+     log_val | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         (1) |  -.7385216   .3476183    -2.12   0.035    -1.426145   -.0508983
+------------------------------------------------------------------------------
+
+. local pre_mean = r(estimate)
+
+. local pre_se = r(se)
+
+. local pre_t = `pre_mean' / `pre_se'
+
+. local pre_p = 2 * ttail(r(df), abs(`pre_t'))
+
+. di as txt "  Pre-Treatment Leads Mean (27 periods): " as res %7.4f `pre_mean' as txt " (
+> SE = " as res %7.4f `pre_se' as txt ", t = " as res %5.2f `pre_t' as txt ", p = " as res
+>  %6.4f `pre_p' as txt ")"
+  Pre-Treatment Leads Mean (27 periods): -0.7385 (SE =  0.3476, t = -2.12, p = 0.0355)
+
+. 
+. * Post-treatment mean across 9 post-period months
+. lincom (`post_sum') / 9
+
+ ( 1)  .1111111*ev_202504 + .1111111*ev_202505 + .1111111*ev_202506 + .1111111*ev_202507 +
+       .1111111*ev_202508 + .1111111*ev_202509 + .1111111*ev_202510 + .1111111*ev_202511 +
+       .1111111*ev_202512 = 0
+
+------------------------------------------------------------------------------
+     log_val | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         (1) |   .7321124   .3429765     2.13   0.035     .0536709    1.410554
+------------------------------------------------------------------------------
+
+. local post_mean = r(estimate)
+
+. local post_se = r(se)
+
+. local post_t = `post_mean' / `post_se'
+
+. local post_p = 2 * ttail(r(df), abs(`post_t'))
+
+. di as txt "  Post-Treatment Lags Mean (9 periods):  " as res %7.4f `post_mean' as txt " 
+> (SE = " as res %7.4f `post_se' as txt ", t = " as res %5.2f `post_t' as txt ", p = " as 
+> res %6.4f `post_p' as txt ")"
+  Post-Treatment Lags Mean (9 periods):   0.7321 (SE =  0.3430, t =  2.13, p = 0.0346)
+
+. 
+. * Net Dynamic Shift (Post - Pre)
+. lincom (`post_sum') / 9 - (`pre_sum') / 27
+
+ ( 1)  - .037037*ev_202301 - .037037*ev_202302 - .037037*ev_202303 - .037037*ev_202304 -
+       .037037*ev_202305 - .037037*ev_202306 - .037037*ev_202307 - .037037*ev_202308 -
+       .037037*ev_202309 - .037037*ev_202310 - .037037*ev_202311 - .037037*ev_202312 -
+       .037037*ev_202401 - .037037*ev_202402 - .037037*ev_202403 - .037037*ev_202404 -
+       .037037*ev_202405 - .037037*ev_202406 - .037037*ev_202407 - .037037*ev_202408 -
+       .037037*ev_202409 - .037037*ev_202410 - .037037*ev_202411 - .037037*ev_202412 -
+       .037037*ev_202501 - .037037*ev_202502 + .1111111*ev_202504 + .1111111*ev_202505 +
+       .1111111*ev_202506 + .1111111*ev_202507 + .1111111*ev_202508 + .1111111*ev_202509 +
+       .1111111*ev_202510 + .1111111*ev_202511 + .1111111*ev_202512 = 0
+
+------------------------------------------------------------------------------
+     log_val | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         (1) |   1.470634   .2888768     5.09   0.000     .8992072    2.042061
+------------------------------------------------------------------------------
+
+. local shift_est = r(estimate)
+
+. local shift_se = r(se)
+
+. local shift_t = `shift_est' / `shift_se'
+
+. local shift_p = 2 * ttail(r(df), abs(`shift_t'))
+
+. di as txt "  Net Dynamic Shift (Post - Pre):        " as res %7.4f `shift_est' as txt " 
+> (SE = " as res %7.4f `shift_se' as txt ", t = " as res %5.2f `shift_t' as txt ", p = " a
+> s res %6.4f `shift_p' as txt ")"
+  Net Dynamic Shift (Post - Pre):         1.4706 (SE =  0.2889, t =  5.09, p = 0.0000)
+
+. di as txt "  Note: Pre-mean (-0.7385) accounts for omitted 2025M03 (beta=0); net dynamic
+>  shift (+1.4706) recovers baseline DiD (1.4720)."
+  Note: Pre-mean (-0.7385) accounts for omitted 2025M03 (beta=0); net dynamic shift (+1.47
+> 06) recovers baseline DiD (1.4720).
+
+. 
+. * Sub-window leads and lags for Table 4 Panel A
+. di as txt _newline ">>> TABLE 4 PANEL A: SUB-WINDOW LEADS AND LAGS <<<"
+
+>>> TABLE 4 PANEL A: SUB-WINDOW LEADS AND LAGS <<<
+
+. lincom (ev_202301 + ev_202302 + ev_202303 + ev_202304 + ev_202305 + ev_202306 + ev_20230
+> 7 + ev_202308 + ev_202309 + ev_202310 + ev_202311 + ev_202312) / 12
+
+ ( 1)  .0833333*ev_202301 + .0833333*ev_202302 + .0833333*ev_202303 + .0833333*ev_202304 +
+       .0833333*ev_202305 + .0833333*ev_202306 + .0833333*ev_202307 + .0833333*ev_202308 +
+       .0833333*ev_202309 + .0833333*ev_202310 + .0833333*ev_202311 + .0833333*ev_202312 =
+       0
+
+------------------------------------------------------------------------------
+     log_val | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         (1) |  -.7784403   .3865735    -2.01   0.046    -1.543121   -.0137596
+------------------------------------------------------------------------------
+
+. di as txt "  Year 1 Pre-Treatment (2023M01-M12, 12m): " as res %7.4f r(estimate) as txt 
+> " (SE = " as res %7.4f r(se) as txt ", t = " as res %5.2f r(estimate)/r(se) as txt ", p 
+> = " as res %6.4f 2*ttail(r(df), abs(r(estimate)/r(se))) as txt ")"
+  Year 1 Pre-Treatment (2023M01-M12, 12m): -0.7784 (SE =  0.3866, t = -2.01, p = 0.0461)
+
+. 
+. lincom (ev_202401 + ev_202402 + ev_202403 + ev_202404 + ev_202405 + ev_202406 + ev_20240
+> 7 + ev_202408 + ev_202409 + ev_202410 + ev_202411 + ev_202412) / 12
+
+ ( 1)  .0833333*ev_202401 + .0833333*ev_202402 + .0833333*ev_202403 + .0833333*ev_202404 +
+       .0833333*ev_202405 + .0833333*ev_202406 + .0833333*ev_202407 + .0833333*ev_202408 +
+       .0833333*ev_202409 + .0833333*ev_202410 + .0833333*ev_202411 + .0833333*ev_202412 =
+       0
+
+------------------------------------------------------------------------------
+     log_val | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         (1) |  -.8434201   .3785938    -2.23   0.028    -1.592316   -.0945242
+------------------------------------------------------------------------------
+
+. di as txt "  Year 2 Pre-Treatment (2024M01-M12, 12m): " as res %7.4f r(estimate) as txt 
+> " (SE = " as res %7.4f r(se) as txt ", t = " as res %5.2f r(estimate)/r(se) as txt ", p 
+> = " as res %6.4f 2*ttail(r(df), abs(r(estimate)/r(se))) as txt ")"
+  Year 2 Pre-Treatment (2024M01-M12, 12m): -0.8434 (SE =  0.3786, t = -2.23, p = 0.0276)
+
+. 
+. lincom (ev_202501 + ev_202502) / 2
+
+ ( 1)  .5*ev_202501 + .5*ev_202502 = 0
+
+------------------------------------------------------------------------------
+     log_val | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         (1) |  -.2388794    .305225    -0.78   0.435    -.8426447    .3648858
+------------------------------------------------------------------------------
+
+. di as txt "  Immediate Pre-Period (2025M01-M02, 2m):   " as res %7.4f r(estimate) as txt
+>  " (SE = " as res %7.4f r(se) as txt ", t = " as res %5.2f r(estimate)/r(se) as txt ", p
+>  = " as res %6.4f 2*ttail(r(df), abs(r(estimate)/r(se))) as txt ")"
+  Immediate Pre-Period (2025M01-M02, 2m):   -0.2389 (SE =  0.3052, t = -0.78, p = 0.4352)
+
+. 
+. lincom (ev_202508 + ev_202509 + ev_202510 + ev_202511 + ev_202512) / 5
+
+ ( 1)  .2*ev_202508 + .2*ev_202509 + .2*ev_202510 + .2*ev_202511 + .2*ev_202512 = 0
+
+------------------------------------------------------------------------------
+     log_val | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         (1) |   .8881505   .4206049     2.11   0.037     .0561525    1.720149
+------------------------------------------------------------------------------
+
+. di as txt "  Late Tariff Window   (2025M08-M12, 5m):   " as res %7.4f r(estimate) as txt
+>  " (SE = " as res %7.4f r(se) as txt ", t = " as res %5.2f r(estimate)/r(se) as txt ", p
+>  = " as res %6.4f 2*ttail(r(df), abs(r(estimate)/r(se))) as txt ")"
+  Late Tariff Window   (2025M08-M12, 5m):    0.8882 (SE =  0.4206, t =  2.11, p = 0.0366)
+
+. 
+. * ------------------------------------------------------------------------------
+. * SPECIFICATION 6B: 2024M12-REFERENCED EVENT STUDY (FIGURE 1 & EXACT COVARIANCE MATRIX)
+. * ------------------------------------------------------------------------------
+. di _newline ">>> SPECIFICATION 6B: 2024M12-REFERENCED DYNAMIC EVENT STUDY (SUN & ABRAHAM
+>  2021) <<<"
+
+>>> SPECIFICATION 6B: 2024M12-REFERENCED DYNAMIC EVENT STUDY (SUN & ABRAHAM 2021) <<<
+
+. * Reference period: 2024M12 (omitted to avoid 2025M03 anticipatory anchor distortion)
+. local ev12_vars ""
+
+. foreach p of local all_periods {
+  2.     if `p' != 202412 {
+  3.         cap drop ev12_`p'
+  4.         gen double ev12_`p' = ex_china * china_share_2022 * (period == `p')
+  5.         local ev12_vars "`ev12_vars' ev12_`p'"
+  6.     }
+  7. }
+
+. 
+. di as txt "Estimating 2024M12-omitted dynamic event study for exact covariance matrix...
+> "
+Estimating 2024M12-omitted dynamic event study for exact covariance matrix...
+
+. reghdfe log_val `ev12_vars', absorb(partner_sector sector_period partner_period) vce(clu
+> ster sector)
+(dropped 80 singleton observations)
+(MWFE estimator converged in 12 iterations)
+
+HDFE Linear regression                            Number of obs   =     25,544
+Absorbing 3 HDFE groups                           F(  35,    132) =       3.41
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.9520
+                                                  Adj R-squared   =     0.9381
+                                                  Within R-sq.    =     0.0057
+Number of clusters (sector)  =        133         Root MSE        =     0.7025
+
+                               (Std. err. adjusted for 133 clusters in sector)
+------------------------------------------------------------------------------
+             |               Robust
+     log_val | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ ev12_202301 |  -.4104431   .3983125    -1.03   0.305    -1.198345    .3774585
+ ev12_202302 |  -.2035653   .2907438    -0.70   0.485    -.7786853    .3715546
+ ev12_202303 |    .182966   .3836527     0.48   0.634     -.575937     .941869
+ ev12_202304 |   .0610996   .3514537     0.17   0.862    -.6341106    .7563097
+ ev12_202305 |  -.1969225   .3714425    -0.53   0.597    -.9316724    .5378275
+ ev12_202306 |   .0747392   .2977188     0.25   0.802     -.514178    .6636563
+ ev12_202307 |   .0533061   .3574996     0.15   0.882    -.6538634    .7604756
+ ev12_202308 |   -.458965    .354061    -1.30   0.197    -1.159333    .2414027
+ ev12_202309 |  -.2099153   .4343815    -0.48   0.630    -1.069165    .6493343
+ ev12_202310 |   .0611789   .3786665     0.16   0.872    -.6878608    .8102186
+ ev12_202311 |  -.7109837   .3122238    -2.28   0.024    -1.328593   -.0933742
+ ev12_202312 |    .396583   .4130386     0.96   0.339    -.4204481    1.213614
+ ev12_202401 |   .1476012   .4063103     0.36   0.717    -.6561208    .9513233
+ ev12_202402 |  -.1677888   .3369787    -0.50   0.619    -.8343659    .4987883
+ ev12_202403 |   .1159309   .2411014     0.48   0.631    -.3609915    .5928534
+ ev12_202404 |  -.0376855   .2604621    -0.14   0.885    -.5529054    .4775344
+ ev12_202405 |  -.3974656   .3832471    -1.04   0.302    -1.155566    .3606349
+ ev12_202406 |  -.2963648   .3598285    -0.82   0.412    -1.008141    .4154115
+ ev12_202407 |  -.1201338   .3307757    -0.36   0.717    -.7744408    .5341732
+ ev12_202408 |  -.2742589   .2693833    -1.02   0.310    -.8071258     .258608
+ ev12_202409 |  -.4151719   .3689559    -1.13   0.263    -1.145003    .3146594
+ ev12_202410 |   -.530888   .3743522    -1.42   0.159    -1.271394    .2096176
+ ev12_202411 |  -.1644557   .2266941    -0.73   0.469     -.612879    .2839676
+ ev12_202501 |   .5335258   .3949664     1.35   0.179    -.2477569    1.314808
+ ev12_202502 |   .3187755   .2962938     1.08   0.284    -.2673229     .904874
+ ev12_202503 |   .6650301    .352976     1.88   0.062    -.0331913    1.363252
+ ev12_202504 |   .8555845   .3835021     2.23   0.027     .0969795    1.614189
+ ev12_202505 |   .8409985   .3601731     2.33   0.021     .1285405    1.553456
+ ev12_202506 |   1.341235    .393193     3.41   0.001     .5634603    2.119009
+ ev12_202507 |   1.770562   .3649376     4.85   0.000     1.048679    2.492444
+ ev12_202508 |   1.026602   .4032645     2.55   0.012     .2289048    1.824299
+ ev12_202509 |   1.739756   .4748044     3.66   0.000      .800546    2.678966
+ ev12_202510 |   1.499677   .4472258     3.35   0.001     .6150196    2.384333
+ ev12_202511 |   1.777525   .4780386     3.72   0.000     .8319173    2.723133
+ ev12_202512 |   1.722344   .4087137     4.21   0.000     .9138673     2.53082
+       _cons |   1.273173   .0378622    33.63   0.000     1.198277    1.348068
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+--------------------------------------------------------+
+    Absorbed FE | Categories  - Redundant  = Num. Coefs |
+----------------+---------------------------------------|
+ partner_sector |       784         784           0    *|
+  sector_period |      4696        4696           0    *|
+ partner_period |       216           1         215     |
+--------------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. di as txt _newline "2024M12-Referenced Anticipation Trajectory (2025Q1):"
+
+2024M12-Referenced Anticipation Trajectory (2025Q1):
+
+. foreach p in 202501 202502 202503 {
+  2.     local b_p = _b[ev12_`p']
+  3.     local se_p = _se[ev12_`p']
+  4.     local p_p = 2 * ttail(e(df_r), abs(`b_p' / `se_p'))
+  5.     di as txt "  Period `p': beta = " as res %7.4f `b_p' as txt " (SE = " as res %7.4
+> f `se_p' as txt ", p = " as res %6.4f `p_p' as txt ")"
+  6. }
+  Period 202501: beta =  0.5335 (SE =  0.3950, p = 0.1791)
+  Period 202502: beta =  0.3188 (SE =  0.2963, p = 0.2839)
+  Period 202503: beta =  0.6650 (SE =  0.3530, p = 0.0618)
+
+. di as txt "Note: Phase 4 2024M12-referenced raw shifts (+0.5335, +0.3188, +0.6650) algeb
+> raically map to Phase 2 spline-detrended shifts (+0.7473, +0.5376, +0.8897) relative to 
+> extrapolated 2023-2024 pre-trend (theta = -0.0051/mo)."
+Note: Phase 4 2024M12-referenced raw shifts (+0.5335, +0.3188, +0.6650) algebraically map 
+> to Phase 2 spline-detrended shifts (+0.7473, +0.5376, +0.8897) relative to extrapolated 
+> 2023-2024 pre-trend (theta = -0.0051/mo).
+
+. 
+. * Export Event Study Data and Generate Figure 1 Chart (Anchored at 2024M12)
+. preserve
+
+.     tempname evpost12
+
+.     tempfile evdata12
+
+.     postfile `evpost12' int period double (b se ci_lower ci_upper) using `evdata12'
+
+.     foreach p of local all_periods {
+  2.         if `p' == 202412 {
+  3.             post `evpost12' (`p') (0.0) (0.0) (0.0) (0.0)
+  4.         }
+  5.         else {
+  6.             local b_p = _b[ev12_`p']
+  7.             local se_p = _se[ev12_`p']
+  8.             local cil_p = `b_p' - 1.96 * `se_p'
+  9.             local ciu_p = `b_p' + 1.96 * `se_p'
+ 10.             post `evpost12' (`p') (`b_p') (`se_p') (`cil_p') (`ciu_p')
+ 11.         }
+ 12.     }
+
+.     postclose `evpost12'
+
+.     use `evdata12', clear
+
+.     gen int t = _n
+
+.     cap twoway (rcap ci_lower ci_upper t, lcolor(navy%60)) ///
+>                (scatter b t, mcolor(navy) msymbol(O) msize(small)) ///
+>                (line b t, lcolor(navy) lpattern(solid)), ///
+>                yline(0, lpattern(dash) lcolor(gs8)) ///
+>                xline(24, lpattern(dash) lcolor(cranberry)) ///
+>                xtitle("Consecutive Month (2023M01 to 2025M12)") ///
+>                ytitle("Log Points (Relative to 2024M12)") ///
+>                title("Dynamic Event-Study Trajectory (Ref: 2024M12)") ///
+>                legend(off) scheme(s2color)
+
+.     cap graph export "../../results/figures/figure_event_study_2024m12.png", replace wid
+> th(2400)
+
+. restore
+
+. 
+. di as txt _newline ">>> PRE-TREATMENT BASELINE TESTS (2023-2024 HORIZON) <<<"
+
+>>> PRE-TREATMENT BASELINE TESTS (2023-2024 HORIZON) <<<
+
 . foreach v in win_2023 win_2024 treat_w23 treat_w24 treat_w_early treat_w_post {
   2.     cap drop `v'
   3. }
@@ -1184,12 +1563,13 @@ Post-Treatment Monthly Estimates (April - Dec 2025):
 
 . gen double treat_w24 = ex_china * china_share_2022 * win_2024
 
-. gen double treat_w_early = ex_china * china_share_2022 * (period >= 202501 & period <= 202502)
+. gen double treat_w_early = ex_china * china_share_2022 * (period >= 202501 & period <= 2
+> 02502)
 
 . gen double treat_w_post  = ex_china * china_share_2022 * (period >= 202504)
 
-. qui reghdfe log_val treat_w23 treat_w24 treat_w_early treat_w_post, absorb(partner_sector sector_period partner_period) vce(cluster se
-> ctor)
+. qui reghdfe log_val treat_w23 treat_w24 treat_w_early treat_w_post, absorb(partner_secto
+> r sector_period partner_period) vce(cluster sector)
 
 . test treat_w23 = treat_w24
 
@@ -1202,8 +1582,8 @@ Post-Treatment Monthly Estimates (April - Dec 2025):
 
 . local p_win = r(p)
 
-. di as txt "Pre-Treatment Annual Window Equality Test (2023 vs 2024): F(1, 132) = " as res %7.4f `f_win' as txt ", p = " as res %6.4f `
-> p_win'
+. di as txt "Pre-Treatment Annual Window Equality Test (2023 vs 2024): F(1, 132) = " as re
+> s %7.4f `f_win' as txt ", p = " as res %6.4f `p_win'
 Pre-Treatment Annual Window Equality Test (2023 vs 2024): F(1, 132) =  0.1100, p = 0.7406
 
 . foreach v in win_2023 win_2024 treat_w23 treat_w24 treat_w_early treat_w_post {
@@ -1234,7 +1614,8 @@ PART 7: JULY-SPLIT IMPLEMENTATION DYNAMICS (EARLY VS LATE POST)
 . gen double treat_late  = ex_china * china_share_2022 * late_post
 
 . 
-. reghdfe log_val treat_early treat_late, absorb(partner_sector sector_period partner_period) vce(cluster sector)
+. reghdfe log_val treat_early treat_late, absorb(partner_sector sector_period partner_peri
+> od) vce(cluster sector)
 (dropped 80 singleton observations)
 (MWFE estimator converged in 12 iterations)
 
@@ -1266,12 +1647,14 @@ Absorbed degrees of freedom:
 --------------------------------------------------------+
 * = FE nested within cluster; treated as redundant for DoF computation
 
-. di as txt "Early Grace Period (Apr-Jun 2025): beta = " as res %7.4f _b[treat_early] as txt " (SE = " as res %7.4f _se[treat_early] as 
-> txt ", p = " as res %6.4f 2*(1-normal(abs(_b[treat_early]/_se[treat_early]))) as txt ")"
-Early Grace Period (Apr-Jun 2025): beta =  1.0874 (SE =  0.3387, p = 0.0013)
+. di as txt "Early Grace Period (Apr-Jun 2025): beta = " as res %7.4f _b[treat_early] as t
+> xt " (SE = " as res %7.4f _se[treat_early] as txt ", p = " as res %6.4f 2*ttail(e(df_r),
+>  abs(_b[treat_early]/_se[treat_early])) as txt ")"
+Early Grace Period (Apr-Jun 2025): beta =  1.0874 (SE =  0.3387, p = 0.0017)
 
-. di as txt "Full Enforcement (Jul-Dec 2025):   beta = " as res %7.4f _b[treat_late]  as txt " (SE = " as res %7.4f _se[treat_late]  as 
-> txt ", p = " as res %6.4f 2*(1-normal(abs(_b[treat_late]/_se[treat_late]))) as txt ")"
+. di as txt "Full Enforcement (Jul-Dec 2025):   beta = " as res %7.4f _b[treat_late]  as t
+> xt " (SE = " as res %7.4f _se[treat_late]  as txt ", p = " as res %6.4f 2*ttail(e(df_r),
+>  abs(_b[treat_late]/_se[treat_late])) as txt ")"
 Full Enforcement (Jul-Dec 2025):   beta =  1.6637 (SE =  0.3030, p = 0.0000)
 
 . 
@@ -1285,27 +1668,55 @@ PART 8: DOSE-RESPONSE MONOTONICITY (CALLAWAY, GOODMAN-BACON, SANT'ANNA 2024)
 . di "========================================================================"
 ========================================================================
 
-. foreach v in tercile d_T1 d_T2 d_T3 {
-  2.     cap drop `v'
-  3. }
+. * Tercile assignment at unique 133-sector cross-section level
+. preserve
 
-. xtile tercile = china_share_2022, nq(3)
+.     duplicates drop sector, force
 
+Duplicates in terms of sector
+
+(25,491 observations deleted)
+
+.     xtile tercile = china_share_2022, nq(3)
+
+.     keep sector tercile
+
+.     tempfile sector_terciles
+
+.     save `sector_terciles'
+file E:\Cache\Temp\ST_314c_00000c.tmp saved as .dta format
+
+. restore
+
+. cap drop tercile
+
+. merge m:1 sector using `sector_terciles', keepusing(tercile)
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                            25,624  (_merge==3)
+    -----------------------------------------
+
+. drop _merge
+
+. 
 . gen double d_T2 = ex_china * (tercile == 2) * post
 
 . gen double d_T3 = ex_china * (tercile == 3) * post
 
 . 
-. reghdfe log_val d_T2 d_T3, absorb(partner_sector sector_period partner_period) vce(cluster sector)
+. reghdfe log_val d_T2 d_T3, absorb(partner_sector sector_period partner_period) vce(clust
+> er sector)
 (dropped 80 singleton observations)
 (MWFE estimator converged in 12 iterations)
 
 HDFE Linear regression                            Number of obs   =     25,544
-Absorbing 3 HDFE groups                           F(   2,    132) =      11.16
+Absorbing 3 HDFE groups                           F(   2,    132) =      11.36
 Statistics robust to heteroskedasticity           Prob > F        =     0.0000
                                                   R-squared       =     0.9519
                                                   Adj R-squared   =     0.9381
-                                                  Within R-sq.    =     0.0039
+                                                  Within R-sq.    =     0.0041
 Number of clusters (sector)  =        133         Root MSE        =     0.7025
 
                                (Std. err. adjusted for 133 clusters in sector)
@@ -1313,9 +1724,9 @@ Number of clusters (sector)  =        133         Root MSE        =     0.7025
              |               Robust
      log_val | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-        d_T2 |   .2811663   .0920049     3.06   0.003     .0991716     .463161
-        d_T3 |   .5691563   .1239509     4.59   0.000     .3239691    .8143435
-       _cons |   1.264874   .0127442    99.25   0.000     1.239665    1.290084
+        d_T2 |   .2549169   .0934851     2.73   0.007      .069994    .4398397
+        d_T3 |    .582347   .1224839     4.75   0.000     .3400617    .8246322
+       _cons |    1.26298   .0135546    93.18   0.000     1.236168    1.289792
 ------------------------------------------------------------------------------
 
 Absorbed degrees of freedom:
@@ -1328,42 +1739,20 @@ Absorbed degrees of freedom:
 --------------------------------------------------------+
 * = FE nested within cluster; treated as redundant for DoF computation
 
-. di as txt "Tercile 2 (Medium Share vs Low): beta = " as res %7.4f _b[d_T2] as txt " (SE = " as res %7.4f _se[d_T2] as txt ", p = " as 
-> res %6.4f 2*(1-normal(abs(_b[d_T2]/_se[d_T2]))) as txt ")"
-Tercile 2 (Medium Share vs Low): beta =  0.2812 (SE =  0.0920, p = 0.0022)
+. di as txt "Tercile 2 (Medium Share vs Low): beta = " as res %7.4f _b[d_T2] as txt " (SE 
+> = " as res %7.4f _se[d_T2] as txt ", p = " as res %6.4f 2*ttail(e(df_r), abs(_b[d_T2]/_s
+> e[d_T2])) as txt ")"
+Tercile 2 (Medium Share vs Low): beta =  0.2549 (SE =  0.0935, p = 0.0073)
 
-. di as txt "Tercile 3 (High Share vs Low):   beta = " as res %7.4f _b[d_T3] as txt " (SE = " as res %7.4f _se[d_T3] as txt ", p = " as 
-> res %6.4f 2*(1-normal(abs(_b[d_T3]/_se[d_T3]))) as txt ")"
-Tercile 3 (High Share vs Low):   beta =  0.5692 (SE =  0.1240, p = 0.0000)
+. di as txt "Tercile 3 (High Share vs Low):   beta = " as res %7.4f _b[d_T3] as txt " (SE 
+> = " as res %7.4f _se[d_T3] as txt ", p = " as res %6.4f 2*ttail(e(df_r), abs(_b[d_T3]/_s
+> e[d_T3])) as txt ")"
+Tercile 3 (High Share vs Low):   beta =  0.5823 (SE =  0.1225, p = 0.0000)
 
-. di as res "[VERIFIED] Monotonicity confirmed: beta_T3 > beta_T2 > 0 (p < 0.0001)."
-[VERIFIED] Monotonicity confirmed: beta_T3 > beta_T2 > 0 (p < 0.0001).
+. di as txt "Monotonicity check: beta_T3 > beta_T2 > 0."
+Monotonicity check: beta_T3 > beta_T2 > 0.
 
 . 
-. di _newline "========================================================================"
-
-========================================================================
-
-. di "PART 9: WEBB (2014) WILD CLUSTER BOOTSTRAP (PARTNER DIMENSION G1 = 6)"
-PART 9: WEBB (2014) WILD CLUSTER BOOTSTRAP (PARTNER DIMENSION G1 = 6)
-
-. di "========================================================================"
-========================================================================
-
-. * boottest is incompatible with reghdfe when >1 FE set is absorbed
-. * (Roodman 2019 limitation). Report pre-certified WCB p-values instead.
-. di as txt "boottest requires single absorbed FE; incompatible with 3-way reghdfe specification."
-boottest requires single absorbed FE; incompatible with 3-way reghdfe specification.
-
-. di as txt "Webb (2014) wild cluster bootstrap p-values from pre-certified Stata run:"
-Webb (2014) wild cluster bootstrap p-values from pre-certified Stata run:
-
-. di as txt "  Sector dimension (G=133):  p_WCB <= 0.0007"
-  Sector dimension (G=133):  p_WCB <= 0.0007
-
-. di as txt "  Partner dimension (G=6):   p_WCB <= 0.0020"
-  Partner dimension (G=6):   p_WCB <= 0.0020
-
 . 
 . di _newline "========================================================================"
 
@@ -1384,7 +1773,8 @@ PART 10: TRIPLE-DIFFERENCE (DDD) SERVER/TECH INTERACTION SPECIFICATION
 . gen double treat_tech = treat_base * is_tech
 
 . 
-. reghdfe log_val treat_base treat_tech, absorb(partner_sector sector_period partner_period) vce(cluster sector)
+. reghdfe log_val treat_base treat_tech, absorb(partner_sector sector_period partner_perio
+> d) vce(cluster sector)
 (dropped 80 singleton observations)
 (MWFE estimator converged in 12 iterations)
 
@@ -1416,37 +1806,244 @@ Absorbed degrees of freedom:
 --------------------------------------------------------+
 * = FE nested within cluster; treated as redundant for DoF computation
 
-. di as txt "OLS DDD Base Elasticity (Non-Tech): beta = " as res %7.4f _b[treat_base] as txt " (SE = " as res %7.4f _se[treat_base] as t
-> xt ", p = " as res %6.4f 2*(1-normal(abs(_b[treat_base]/_se[treat_base]))) as txt ")"
+. di as txt "OLS DDD Base Elasticity (Non-Tech): beta = " as res %7.4f _b[treat_base] as t
+> xt " (SE = " as res %7.4f _se[treat_base] as txt ", p = " as res %6.4f 2*ttail(e(df_r), 
+> abs(_b[treat_base]/_se[treat_base])) as txt ")"
 OLS DDD Base Elasticity (Non-Tech): beta =  1.2458 (SE =  0.2178, p = 0.0000)
 
-. di as txt "OLS DDD Tech Interaction:           beta = " as res %7.4f _b[treat_tech] as txt " (SE = " as res %7.4f _se[treat_tech] as t
-> xt ", p = " as res %6.4f 2*(1-normal(abs(_b[treat_tech]/_se[treat_tech]))) as txt ")"
-OLS DDD Tech Interaction:           beta =  3.0677 (SE =  1.6299, p = 0.0598)
+. di as txt "OLS DDD Tech Interaction:           beta = " as res %7.4f _b[treat_tech] as t
+> xt " (SE = " as res %7.4f _se[treat_tech] as txt ", p = " as res %6.4f 2*ttail(e(df_r), 
+> abs(_b[treat_tech]/_se[treat_tech])) as txt ")"
+OLS DDD Tech Interaction:           beta =  3.0677 (SE =  1.6299, p = 0.0620)
 
-. 
+
 . 
 . di _newline "========================================================================"
 
 ========================================================================
 
-. di "PART 11: LANDED UNIT VALUE / PRICE INCIDENCE SPECIFICATION (AMITI ET AL. 2019)"
-PART 11: LANDED UNIT VALUE / PRICE INCIDENCE SPECIFICATION (AMITI ET AL. 2019)
+. di "PART 11: LANDED UNIT VALUE / EXACT QUANTITY-PRICE DECOMPOSITION"
+PART 11: LANDED UNIT VALUE / EXACT QUANTITY-PRICE DECOMPOSITION
 
 . di "========================================================================"
 ========================================================================
 
-. * Unit Value UV = Value / Mass = 1 / Density -> ln(UV) = -ln(Density)
-. gen double uv = trade_value_m_usd / net_mass_mt if net_mass_mt > 0 & trade_value_m_usd > 0
+. * Landed Unit Value UV in USD/kg ((trade_value_m_usd * 1000) / net_mass_mt)
+. cap drop uv log_uv log_mass
+
+. gen double uv = (trade_value_m_usd * 1000) / net_mass_mt if net_mass_mt > 0 & trade_valu
+> e_m_usd > 0
 (2,698 missing values generated)
 
 . gen double log_uv = ln(uv)
 (2,698 missing values generated)
 
+. gen double log_mass = ln(net_mass_mt) if net_mass_mt > 0 & !missing(net_mass_mt)
+(2,698 missing values generated)
+
 . 
-. reghdfe log_uv treat_ex_china_2022, absorb(partner_sector sector_period partner_period) vce(cluster sector partner_iso)
+. di _newline ">>> EXACT ADDITIVE QUANTITY-PRICE DECOMPOSITION (N = 22,764 VALID MASS SAMP
+> LE) <<<"
+
+>>> EXACT ADDITIVE QUANTITY-PRICE DECOMPOSITION (N = 22,764 VALID MASS SAMPLE) <<<
+
+. * 1. Total Dollar Value Reallocation Elasticity (beta_val)
+. reghdfe log_val treat_ex_china_2022 if !missing(net_mass_mt) & net_mass_mt > 0, absorb(p
+> artner_sector sector_period partner_period) vce(cluster sector)
 (dropped 162 singleton observations)
 (MWFE estimator converged in 12 iterations)
+
+HDFE Linear regression                            Number of obs   =     22,764
+Absorbing 3 HDFE groups                           F(   1,    127) =      21.54
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.9534
+                                                  Adj R-squared   =     0.9394
+                                                  Within R-sq.    =     0.0044
+Number of clusters (sector)  =        128         Root MSE        =     0.6754
+
+                                      (Std. err. adjusted for 128 clusters in sector)
+-------------------------------------------------------------------------------------
+                    |               Robust
+            log_val | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+--------------------+----------------------------------------------------------------
+treat_ex_china_2022 |   1.352075   .2912954     4.64   0.000     .7756536    1.928495
+              _cons |   1.468791   .0126188   116.40   0.000      1.44382    1.493761
+-------------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+--------------------------------------------------------+
+    Absorbed FE | Categories  - Redundant  = Num. Coefs |
+----------------+---------------------------------------|
+ partner_sector |       737         737           0    *|
+  sector_period |      4312        4312           0    *|
+ partner_period |       216           1         215     |
+--------------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. local b_val = _b[treat_ex_china_2022]
+
+. local se_val = _se[treat_ex_china_2022]
+
+. local p_val = 2 * ttail(e(df_r), abs(`b_val'/`se_val'))
+
+. reghdfe log_val treat_ex_china_2022 if !missing(net_mass_mt) & net_mass_mt > 0, absorb(p
+> artner_sector sector_period partner_period) vce(cluster sector partner_iso)
+(dropped 162 singleton observations)
+(MWFE estimator converged in 12 iterations)
+Warning: VCV matrix was non-positive semi-definite; adjustment from Cameron, Gelbach & Mil
+> ler applied.
+
+HDFE Linear regression                            Number of obs   =     22,764
+Absorbing 3 HDFE groups                           F(   1,      5) =      17.32
+Statistics robust to heteroskedasticity           Prob > F        =     0.0088
+                                                  R-squared       =     0.9534
+                                                  Adj R-squared   =     0.9394
+Number of clusters (sector)  =        128         Within R-sq.    =     0.0044
+Number of clusters (partner_iso) =          6     Root MSE        =     0.6754
+
+                            (Std. err. adjusted for 6 clusters in sector partner_iso)
+-------------------------------------------------------------------------------------
+                    |               Robust
+            log_val | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+--------------------+----------------------------------------------------------------
+treat_ex_china_2022 |   1.352075    .324874     4.16   0.009     .5169594     2.18719
+              _cons |   1.468791   .0140735   104.37   0.000     1.432614    1.504968
+-------------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+--------------------------------------------------------+
+    Absorbed FE | Categories  - Redundant  = Num. Coefs |
+----------------+---------------------------------------|
+ partner_sector |       737         737           0    *|
+  sector_period |      4312        4312           0    *|
+ partner_period |       216         216           0    *|
+--------------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. local se2_val = _se[treat_ex_china_2022]
+
+. 
+. * 2. Physical Shipping Tonnage Elasticity (beta_mass)
+. reghdfe log_mass treat_ex_china_2022 if !missing(net_mass_mt) & net_mass_mt > 0, absorb(
+> partner_sector sector_period partner_period) vce(cluster sector)
+(dropped 162 singleton observations)
+(MWFE estimator converged in 12 iterations)
+
+HDFE Linear regression                            Number of obs   =     22,764
+Absorbing 3 HDFE groups                           F(   1,    127) =      19.08
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.9462
+                                                  Adj R-squared   =     0.9300
+                                                  Within R-sq.    =     0.0030
+Number of clusters (sector)  =        128         Root MSE        =     0.7450
+
+                                      (Std. err. adjusted for 128 clusters in sector)
+-------------------------------------------------------------------------------------
+                    |               Robust
+           log_mass | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+--------------------+----------------------------------------------------------------
+treat_ex_china_2022 |   1.233929   .2824909     4.37   0.000     .6749301    1.792927
+              _cons |   5.029877   .0122374   411.02   0.000     5.005661    5.054093
+-------------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+--------------------------------------------------------+
+    Absorbed FE | Categories  - Redundant  = Num. Coefs |
+----------------+---------------------------------------|
+ partner_sector |       737         737           0    *|
+  sector_period |      4312        4312           0    *|
+ partner_period |       216           1         215     |
+--------------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. local b_mass = _b[treat_ex_china_2022]
+
+. local se_mass = _se[treat_ex_china_2022]
+
+. local p_mass = 2 * ttail(e(df_r), abs(`b_mass'/`se_mass'))
+
+. reghdfe log_mass treat_ex_china_2022 if !missing(net_mass_mt) & net_mass_mt > 0, absorb(
+> partner_sector sector_period partner_period) vce(cluster sector partner_iso)
+(dropped 162 singleton observations)
+(MWFE estimator converged in 12 iterations)
+Warning: VCV matrix was non-positive semi-definite; adjustment from Cameron, Gelbach & Mil
+> ler applied.
+
+HDFE Linear regression                            Number of obs   =     22,764
+Absorbing 3 HDFE groups                           F(   1,      5) =      12.55
+Statistics robust to heteroskedasticity           Prob > F        =     0.0165
+                                                  R-squared       =     0.9462
+                                                  Adj R-squared   =     0.9300
+Number of clusters (sector)  =        128         Within R-sq.    =     0.0030
+Number of clusters (partner_iso) =          6     Root MSE        =     0.7451
+
+                            (Std. err. adjusted for 6 clusters in sector partner_iso)
+-------------------------------------------------------------------------------------
+                    |               Robust
+           log_mass | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+--------------------+----------------------------------------------------------------
+treat_ex_china_2022 |   1.233929   .3483796     3.54   0.017     .3383903    2.129467
+              _cons |   5.029877   .0150917   333.29   0.000     4.991083    5.068672
+-------------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+--------------------------------------------------------+
+    Absorbed FE | Categories  - Redundant  = Num. Coefs |
+----------------+---------------------------------------|
+ partner_sector |       737         737           0    *|
+  sector_period |      4312        4312           0    *|
+ partner_period |       216         216           0    *|
+--------------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. local se2_mass = _se[treat_ex_china_2022]
+
+. 
+. * 3. Landed Unit Value / Price Elasticity (beta_uv)
+. reghdfe log_uv treat_ex_china_2022 if !missing(net_mass_mt) & net_mass_mt > 0, absorb(pa
+> rtner_sector sector_period partner_period) vce(cluster sector)
+(dropped 162 singleton observations)
+(MWFE estimator converged in 12 iterations)
+
+HDFE Linear regression                            Number of obs   =     22,764
+Absorbing 3 HDFE groups                           F(   1,    127) =       1.97
+Statistics robust to heteroskedasticity           Prob > F        =     0.1630
+                                                  R-squared       =     0.9498
+                                                  Adj R-squared   =     0.9348
+                                                  Within R-sq.    =     0.0002
+Number of clusters (sector)  =        128         Root MSE        =     0.2969
+
+                                      (Std. err. adjusted for 128 clusters in sector)
+-------------------------------------------------------------------------------------
+                    |               Robust
+             log_uv | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+--------------------+----------------------------------------------------------------
+treat_ex_china_2022 |   .1181459   .0842032     1.40   0.163     -.048477    .2847687
+              _cons |   3.346669   .0036477   917.48   0.000     3.339451    3.353887
+-------------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+--------------------------------------------------------+
+    Absorbed FE | Categories  - Redundant  = Num. Coefs |
+----------------+---------------------------------------|
+ partner_sector |       737         737           0    *|
+  sector_period |      4312        4312           0    *|
+ partner_period |       216           1         215     |
+--------------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. local b_uv = _b[treat_ex_china_2022]
+
+. local se_uv = _se[treat_ex_china_2022]
+
+. local p_uv = 2 * ttail(e(df_r), abs(`b_uv'/`se_uv'))
+
+. reghdfe log_uv treat_ex_china_2022 if !missing(net_mass_mt) & net_mass_mt > 0, absorb(pa
+> rtner_sector sector_period partner_period) vce(cluster sector partner_iso)
+(dropped 162 singleton observations)
+(MWFE estimator converged in 12 iterations)
+Warning: VCV matrix was non-positive semi-definite; adjustment from Cameron, Gelbach & Mil
+> ler applied.
 
 HDFE Linear regression                            Number of obs   =     22,764
 Absorbing 3 HDFE groups                           F(   1,      5) =       2.47
@@ -1462,7 +2059,7 @@ Number of clusters (partner_iso) =          6     Root MSE        =     0.2969
              log_uv | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
 --------------------+----------------------------------------------------------------
 treat_ex_china_2022 |   .1181459   .0751731     1.57   0.177    -.0750928    .3113845
-              _cons |  -3.561086   .0032565 -1093.54   0.000    -3.569457   -3.552715
+              _cons |   3.346669   .0032565  1027.69   0.000     3.338298     3.35504
 -------------------------------------------------------------------------------------
 
 Absorbed degrees of freedom:
@@ -1475,20 +2072,55 @@ Absorbed degrees of freedom:
 --------------------------------------------------------+
 * = FE nested within cluster; treated as redundant for DoF computation
 
-. di as txt "Landed Unit Value Elasticity (beta_P): beta = " as res %7.4f _b[treat_ex_china_2022] as txt " (SE = " as res %7.4f _se[trea
-> t_ex_china_2022] as txt ", t = " as res %5.2f _b[treat_ex_china_2022]/_se[treat_ex_china_2022] as txt ")"
-Landed Unit Value Elasticity (beta_P): beta =  0.1181 (SE =  0.0752, t =  1.57)
+. local se2_uv = _se[treat_ex_china_2022]
 
-. di as res "[VERIFIED] Price incidence beta_P = +0.1181 (p > 0.10 null); volume reallocation scaled at unchanged unit values."
-[VERIFIED] Price incidence beta_P = +0.1181 (p > 0.10 null); volume reallocation scaled at unchanged unit values.
+. 
+. local pct_mass = (`b_mass' / `b_val') * 100
+
+. local pct_uv = (`b_uv' / `b_val') * 100
+
+. 
+. di as txt _newline "Exact Additive Quantity-Price Decomposition (N = " as res e(N) as tx
+> t "):"
+
+Exact Additive Quantity-Price Decomposition (N = 22764):
+
+. di as txt "  Total Value Elasticity (beta_V):   " as res %7.4f `b_val'  as txt " (SE_1wa
+> y = " as res %7.4f `se_val'  as txt ", SE_2way = " as res %7.4f `se2_val' as txt ", p = 
+> " as res %6.4f `p_val' as txt ")"
+  Total Value Elasticity (beta_V):    1.3521 (SE_1way =  0.2913, SE_2way =  0.3249, p = 0.
+> 0000)
+
+. di as txt "  Physical Mass Elasticity (beta_Q): " as res %7.4f `b_mass' as txt " (SE_1wa
+> y = " as res %7.4f `se_mass' as txt ", SE_2way = " as res %7.4f `se2_mass' as txt ", p =
+>  " as res %6.4f `p_mass' as txt ")"
+  Physical Mass Elasticity (beta_Q):  1.2339 (SE_1way =  0.2825, SE_2way =  0.3484, p = 0.
+> 0000)
+
+. di as txt "  Landed Unit Value (beta_P):        " as res %7.4f `b_uv'   as txt " (SE_1wa
+> y = " as res %7.4f `se_uv'   as txt ", SE_2way = " as res %7.4f `se2_uv' as txt ", p = "
+>  as res %6.4f `p_uv' as txt ")"
+  Landed Unit Value (beta_P):         0.1181 (SE_1way =  0.0842, SE_2way =  0.0752, p = 0.
+> 1630)
+
+. di as txt "  Additive Identity Check:           beta_V = beta_Q + beta_P (" as res %7.4f
+>  `b_val' as txt " = " as res %7.4f `b_mass' as txt " + " as res %7.4f `b_uv' as txt ")"
+  Additive Identity Check:           beta_V = beta_Q + beta_P ( 1.3521 =  1.2339 +  0.1181
+> )
+
+. di as txt "  Decomposition Shares:              " as res %5.1f `pct_mass' as txt "% Phys
+> ical Tonnage vs " as res %5.1f `pct_uv' as txt "% Unit Value / Compositional Shift"
+  Decomposition Shares:               91.3% Physical Tonnage vs   8.7% Unit Value / Compos
+> itional Shift
+
 
 . 
 . di _newline "========================================================================"
 
 ========================================================================
 
-. di "PART 12: Q1-EXCLUSION FALSIFICATION MODEL (DROPPING 2025M01-2025M03)"
-PART 12: Q1-EXCLUSION FALSIFICATION MODEL (DROPPING 2025M01-2025M03)
+. di "PART 12: Q1-EXCLUSION SENSITIVITY (DROPPING 2025M01-2025M03)"
+PART 12: Q1-EXCLUSION SENSITIVITY (DROPPING 2025M01-2025M03)
 
 . di "========================================================================"
 ========================================================================
@@ -1498,7 +2130,49 @@ PART 12: Q1-EXCLUSION FALSIFICATION MODEL (DROPPING 2025M01-2025M03)
 .     drop if inlist(period, 202501, 202502, 202503)
 (2,146 observations deleted)
 
-.     reghdfe log_val treat_ex_china_2022, absorb(partner_sector sector_period partner_period) vce(cluster sector partner_iso)
+.     * One-way sector clustering
+.     reghdfe log_val treat_ex_china_2022, absorb(partner_sector sector_period partner_per
+> iod) vce(cluster sector)
+(dropped 74 singleton observations)
+(MWFE estimator converged in 11 iterations)
+
+HDFE Linear regression                            Number of obs   =     23,404
+Absorbing 3 HDFE groups                           F(   1,    132) =      26.24
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.9517
+                                                  Adj R-squared   =     0.9376
+                                                  Within R-sq.    =     0.0052
+Number of clusters (sector)  =        133         Root MSE        =     0.7051
+
+                                      (Std. err. adjusted for 133 clusters in sector)
+-------------------------------------------------------------------------------------
+                    |               Robust
+            log_val | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+--------------------+----------------------------------------------------------------
+treat_ex_china_2022 |   1.541572     .30095     5.12   0.000     .9462628     2.13688
+              _cons |   1.247898   .0140453    88.85   0.000     1.220115    1.275681
+-------------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+--------------------------------------------------------+
+    Absorbed FE | Categories  - Redundant  = Num. Coefs |
+----------------+---------------------------------------|
+ partner_sector |       783         783           0    *|
+  sector_period |      4305        4305           0    *|
+ partner_period |       198           1         197     |
+--------------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+.     di as txt "No-Q1 Diversion Elasticity (One-Way Sector SE):   beta = " as res %7.4f _
+> b[treat_ex_china_2022] as txt " (SE = " as res %7.4f _se[treat_ex_china_2022] as txt ", 
+> p = " as res %6.4f 2*ttail(e(df_r), abs(_b[treat_ex_china_2022]/_se[treat_ex_china_2022]
+> )) as txt ")"
+No-Q1 Diversion Elasticity (One-Way Sector SE):   beta =  1.5416 (SE =  0.3009, p = 0.0000
+> )
+
+.     * Two-way clustering
+.     reghdfe log_val treat_ex_china_2022, absorb(partner_sector sector_period partner_per
+> iod) vce(cluster sector partner_iso)
 (dropped 74 singleton observations)
 (MWFE estimator converged in 11 iterations)
 
@@ -1529,12 +2203,15 @@ Absorbed degrees of freedom:
 --------------------------------------------------------+
 * = FE nested within cluster; treated as redundant for DoF computation
 
-.     di as txt "No-Q1 Diversion Elasticity: beta = " as res %7.4f _b[treat_ex_china_2022] as txt " (SE = " as res %7.4f _se[treat_ex_ch
-> ina_2022] as txt ", t = " as res %5.2f _b[treat_ex_china_2022]/_se[treat_ex_china_2022] as txt ")"
-No-Q1 Diversion Elasticity: beta =  1.5416 (SE =  0.2976, t =  5.18)
+.     di as txt "No-Q1 Diversion Elasticity (Two-Way Cluster SE):   beta = " as res %7.4f 
+> _b[treat_ex_china_2022] as txt " (SE = " as res %7.4f _se[treat_ex_china_2022] as txt ",
+>  t = " as res %5.2f _b[treat_ex_china_2022]/_se[treat_ex_china_2022] as txt ")"
+No-Q1 Diversion Elasticity (Two-Way Cluster SE):   beta =  1.5416 (SE =  0.2976, t =  5.18
+> )
 
-.     di as res "[VERIFIED] Baseline robust to Q1 exclusion: beta = 1.5416 (p = 0.0035 under t(5))."
-[VERIFIED] Baseline robust to Q1 exclusion: beta = 1.5416 (p = 0.0035 under t(5)).
+.     di as txt "Baseline robust to Q1 exclusion: beta = 1.5416 (p = 0.0035 under t(5))."
+Baseline robust to Q1 exclusion: beta = 1.5416 (p = 0.0035 under t(5)).
+
 
 . restore
 
@@ -1557,16 +2234,54 @@ PART 13: EXPANDED PARTNER MATRIX & MALAYSIA SENSITIVITY (20-SECTOR PANEL)
 .         use "panel_dose_response_full.dta", clear
 .         gen byte ex_chn = (partner_iso != "CHN")
 .         gen double treat_exp = ex_chn * china_share * post
-.         gen double log_trade_val = ln(max(trade_value_m_usd, 0.001))
+.         * Clean positive flow log transformation
+.         gen double log_trade_val = ln(trade_value_m_usd) if trade_value_m_usd > 0 & !mis
+> sing(trade_value_m_usd)
+(25 missing values generated)
 .         egen ps = group(partner_iso sector)
 .         egen sp = group(sector period)
 .         egen pp = group(partner_iso period)
 .         
 .         * 1. Core 6 partners
-.         reghdfe log_trade_val treat_exp if inlist(partner_iso, "CHN", "VNM", "MEX", "TWN", "THA", "IND"), absorb(ps sp pp) vce(cluster
->  sector partner_iso)
+.         reghdfe log_trade_val treat_exp if inlist(partner_iso, "CHN", "VNM", "MEX", "TWN
+> ", "THA", "IND"), absorb(ps sp pp) vce(cluster sector)
 (MWFE estimator converged in 2 iterations)
-Warning: VCV matrix was non-positive semi-definite; adjustment from Cameron, Gelbach & Miller applied.
+
+HDFE Linear regression                            Number of obs   =      4,320
+Absorbing 3 HDFE groups                           F(   1,     19) =       1.30
+Statistics robust to heteroskedasticity           Prob > F        =     0.2688
+                                                  R-squared       =     0.9799
+                                                  Adj R-squared   =     0.9734
+                                                  Within R-sq.    =     0.0087
+Number of clusters (sector)  =         20         Root MSE        =     0.3421
+
+                                (Std. err. adjusted for 20 clusters in sector)
+------------------------------------------------------------------------------
+             |               Robust
+log_trade_~l | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   treat_exp |   .9048001   .7941978     1.14   0.269    -.7574751    2.567075
+       _cons |   4.112367   .0660355    62.28   0.000     3.974153     4.25058
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+          ps |       120         120           0    *|
+          sp |       720         720           0    *|
+          pp |       216           1         215     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+.         di as txt "Core 6 Partners Elasticity (Sector Cluster):  beta = " as res %7.4f _
+> b[treat_exp] as txt " (SE = " as res %7.4f _se[treat_exp] as txt ", p = " as res %6.4f 2
+> *ttail(e(df_r), abs(_b[treat_exp]/_se[treat_exp])) as txt ")"
+Core 6 Partners Elasticity (Sector Cluster):  beta =  0.9048 (SE =  0.7942, p = 0.2688)
+.         reghdfe log_trade_val treat_exp if inlist(partner_iso, "CHN", "VNM", "MEX", "TWN
+> ", "THA", "IND"), absorb(ps sp pp) vce(cluster sector partner_iso)
+(MWFE estimator converged in 2 iterations)
+Warning: VCV matrix was non-positive semi-definite; adjustment from Cameron, Gelbach & Mil
+> ler applied.
 
 HDFE Linear regression                            Number of obs   =      4,320
 Absorbing 3 HDFE groups                           F(   1,      5) =       3.86
@@ -1594,31 +2309,69 @@ Absorbed degrees of freedom:
           pp |       216         216           0    *|
 -----------------------------------------------------+
 * = FE nested within cluster; treated as redundant for DoF computation
-.         di as txt "Core 6 Partners Elasticity: beta = " as res %7.4f _b[treat_exp] as txt " (SE = " as res %7.4f _se[treat_exp] as txt
->  ")"
-Core 6 Partners Elasticity: beta =  0.9048 (SE =  0.4604)
+.         local t2_6 = _b[treat_exp] / _se[treat_exp]
+.         local p2_6 = 2 * ttail(e(df_r), abs(`t2_6'))
+.         di as txt "Core 6 Partners Elasticity (Two-Way Cluster): beta = " as res %7.4f _
+> b[treat_exp] as txt " (SE = " as res %7.4f _se[treat_exp] as txt ", p = " as res %6.4f `
+> p2_6' as txt ")"
+Core 6 Partners Elasticity (Two-Way Cluster): beta =  0.9048 (SE =  0.4604, p = 0.1065)
 .         
 .         * 2. Core 6 + Malaysia
-.         reghdfe log_trade_val treat_exp if inlist(partner_iso, "CHN", "VNM", "MEX", "TWN", "THA", "IND", "MYS"), absorb(ps sp pp) vce(
-> cluster sector partner_iso)
+.         reghdfe log_trade_val treat_exp if inlist(partner_iso, "CHN", "VNM", "MEX", "TWN
+> ", "THA", "IND", "MYS"), absorb(ps sp pp) vce(cluster sector)
 (MWFE estimator converged in 6 iterations)
-Warning: VCV matrix was non-positive semi-definite; adjustment from Cameron, Gelbach & Miller applied.
 
-HDFE Linear regression                            Number of obs   =      4,998
-Absorbing 3 HDFE groups                           F(   1,      6) =       4.75
-Statistics robust to heteroskedasticity           Prob > F        =     0.0722
-                                                  R-squared       =     0.9762
-                                                  Adj R-squared   =     0.9694
-Number of clusters (sector)  =         20         Within R-sq.    =     0.0054
-Number of clusters (partner_iso) =          7     Root MSE        =     0.4009
+HDFE Linear regression                            Number of obs   =      4,981
+Absorbing 3 HDFE groups                           F(   1,     19) =       1.16
+Statistics robust to heteroskedasticity           Prob > F        =     0.2960
+                                                  R-squared       =     0.9794
+                                                  Adj R-squared   =     0.9735
+                                                  Within R-sq.    =     0.0061
+Number of clusters (sector)  =         20         Root MSE        =     0.3591
+
+                                (Std. err. adjusted for 20 clusters in sector)
+------------------------------------------------------------------------------
+             |               Robust
+log_trade_~l | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   treat_exp |   .8509956   .7918226     1.07   0.296    -.8063082    2.508299
+       _cons |   3.919005   .0675634    58.00   0.000     3.777593    4.060417
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+          ps |       140         140           0    *|
+          sp |       720         720           0    *|
+          pp |       252           1         251     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+.         di as txt "Core 6 + MYS Elasticity (Sector Cluster):     beta = " as res %7.4f _
+> b[treat_exp] as txt " (SE = " as res %7.4f _se[treat_exp] as txt ", p = " as res %6.4f 2
+> *ttail(e(df_r), abs(_b[treat_exp]/_se[treat_exp])) as txt ")"
+Core 6 + MYS Elasticity (Sector Cluster):     beta =  0.8510 (SE =  0.7918, p = 0.2960)
+.         reghdfe log_trade_val treat_exp if inlist(partner_iso, "CHN", "VNM", "MEX", "TWN
+> ", "THA", "IND", "MYS"), absorb(ps sp pp) vce(cluster sector partner_iso)
+(MWFE estimator converged in 6 iterations)
+Warning: VCV matrix was non-positive semi-definite; adjustment from Cameron, Gelbach & Mil
+> ler applied.
+
+HDFE Linear regression                            Number of obs   =      4,981
+Absorbing 3 HDFE groups                           F(   1,      6) =       4.12
+Statistics robust to heteroskedasticity           Prob > F        =     0.0886
+                                                  R-squared       =     0.9794
+                                                  Adj R-squared   =     0.9735
+Number of clusters (sector)  =         20         Within R-sq.    =     0.0061
+Number of clusters (partner_iso) =          7     Root MSE        =     0.3591
 
                      (Std. err. adjusted for 7 clusters in sector partner_iso)
 ------------------------------------------------------------------------------
              |               Robust
 log_trade_~l | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-   treat_exp |   .8964572   .4113988     2.18   0.072    -.1101995    1.903114
-       _cons |   3.878046   .0351067   110.46   0.000     3.792143    3.963948
+   treat_exp |   .8509956   .4190551     2.03   0.089    -.1743952    1.876386
+       _cons |   3.919005   .0357565   109.60   0.000     3.831512    4.006498
 ------------------------------------------------------------------------------
 
 Absorbed degrees of freedom:
@@ -1630,30 +2383,68 @@ Absorbed degrees of freedom:
           pp |       252         252           0    *|
 -----------------------------------------------------+
 * = FE nested within cluster; treated as redundant for DoF computation
-.         di as txt "Core 6 + MYS Elasticity:    beta = " as res %7.4f _b[treat_exp] as txt " (SE = " as res %7.4f _se[treat_exp] as txt
->  ")"
-Core 6 + MYS Elasticity:    beta =  0.8965 (SE =  0.4114)
+.         local t2_7 = _b[treat_exp] / _se[treat_exp]
+.         local p2_7 = 2 * ttail(e(df_r), abs(`t2_7'))
+.         di as txt "Core 6 + MYS Elasticity (Two-Way Cluster):    beta = " as res %7.4f _
+> b[treat_exp] as txt " (SE = " as res %7.4f _se[treat_exp] as txt ", p = " as res %6.4f `
+> p2_7' as txt ")"
+Core 6 + MYS Elasticity (Two-Way Cluster):    beta =  0.8510 (SE =  0.4191, p = 0.0886)
 .         
 .         * 3. All 11 Partners
-.         reghdfe log_trade_val treat_exp, absorb(ps sp pp) vce(cluster sector partner_iso)
+.         reghdfe log_trade_val treat_exp, absorb(ps sp pp) vce(cluster sector)
 (MWFE estimator converged in 6 iterations)
-Warning: VCV matrix was non-positive semi-definite; adjustment from Cameron, Gelbach & Miller applied.
 
-HDFE Linear regression                            Number of obs   =      7,877
-Absorbing 3 HDFE groups                           F(   1,     10) =       7.57
-Statistics robust to heteroskedasticity           Prob > F        =     0.0204
-                                                  R-squared       =     0.9735
-                                                  Adj R-squared   =     0.9681
-Number of clusters (sector)  =         20         Within R-sq.    =     0.0017
-Number of clusters (partner_iso) =         11     Root MSE        =     0.4171
+HDFE Linear regression                            Number of obs   =      7,852
+Absorbing 3 HDFE groups                           F(   1,     19) =       1.13
+Statistics robust to heteroskedasticity           Prob > F        =     0.3019
+                                                  R-squared       =     0.9775
+                                                  Adj R-squared   =     0.9729
+                                                  Within R-sq.    =     0.0020
+Number of clusters (sector)  =         20         Root MSE        =     0.3730
+
+                                (Std. err. adjusted for 20 clusters in sector)
+------------------------------------------------------------------------------
+             |               Robust
+log_trade_~l | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   treat_exp |   .6335703   .5970572     1.06   0.302    -.6160848    1.883225
+       _cons |   3.322005   .0540631    61.45   0.000      3.20885    3.435161
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+          ps |       220         220           0    *|
+          sp |       720         720           0    *|
+          pp |       396           1         395     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+.         di as txt "All 11 Partners Elasticity (Sector Cluster):  beta = " as res %7.4f _
+> b[treat_exp] as txt " (SE = " as res %7.4f _se[treat_exp] as txt ", p = " as res %6.4f 2
+> *ttail(e(df_r), abs(_b[treat_exp]/_se[treat_exp])) as txt ")"
+All 11 Partners Elasticity (Sector Cluster):  beta =  0.6336 (SE =  0.5971, p = 0.3019)
+.         reghdfe log_trade_val treat_exp, absorb(ps sp pp) vce(cluster sector partner_iso
+> )
+(MWFE estimator converged in 6 iterations)
+Warning: VCV matrix was non-positive semi-definite; adjustment from Cameron, Gelbach & Mil
+> ler applied.
+
+HDFE Linear regression                            Number of obs   =      7,852
+Absorbing 3 HDFE groups                           F(   1,     10) =       6.91
+Statistics robust to heteroskedasticity           Prob > F        =     0.0252
+                                                  R-squared       =     0.9775
+                                                  Adj R-squared   =     0.9729
+Number of clusters (sector)  =         20         Within R-sq.    =     0.0020
+Number of clusters (partner_iso) =         11     Root MSE        =     0.3730
 
                     (Std. err. adjusted for 11 clusters in sector partner_iso)
 ------------------------------------------------------------------------------
              |               Robust
 log_trade_~l | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-   treat_exp |   .6600743   .2399293     2.75   0.020     .1254785     1.19467
-       _cons |   3.286905   .0217438   151.16   0.000     3.238457    3.335354
+   treat_exp |   .6335703   .2410418     2.63   0.025     .0964957    1.170645
+       _cons |   3.322005   .0218262   152.20   0.000     3.273373    3.370637
 ------------------------------------------------------------------------------
 
 Absorbed degrees of freedom:
@@ -1665,19 +2456,128 @@ Absorbed degrees of freedom:
           pp |       396         396           0    *|
 -----------------------------------------------------+
 * = FE nested within cluster; treated as redundant for DoF computation
-.         di as txt "All 11 Partners Elasticity: beta = " as res %7.4f _b[treat_exp] as txt " (SE = " as res %7.4f _se[treat_exp] as txt
->  ")"
-All 11 Partners Elasticity: beta =  0.6601 (SE =  0.2399)
-.         di as res "[VERIFIED] Reference group attenuation confirmed: 0.9048 -> 0.8510 -> 0.6337."
-[VERIFIED] Reference group attenuation confirmed: 0.9048 -> 0.8510 -> 0.6337.
+.         di as txt "All 11 Partners Elasticity (Two-Way Cluster): beta = " as res %7.4f _
+> b[treat_exp] as txt " (SE = " as res %7.4f _se[treat_exp] as txt ")"
+All 11 Partners Elasticity (Two-Way Cluster): beta =  0.6336 (SE =  0.2410)
 .     }
 
 . restore
 
 . 
+. di _newline "========================================================================"
+
+========================================================================
+
+. di "PART 14: CALENDAR-MONTH SEASONALITY (PS_MONTH) & UNIT-SPECIFIC TIME TRENDS"
+PART 14: CALENDAR-MONTH SEASONALITY (PS_MONTH) & UNIT-SPECIFIC TIME TRENDS
+
+. di "========================================================================"
+========================================================================
+
+. * Differential partner x sector calendar seasonality alpha_{is, month(t)}
+. gen byte cal_month = mod(period, 100)
+
+. egen ps_month = group(partner_iso sector cal_month)
+
+. 
+. di _newline ">>> SPECIFICATION 14A: Controlling for Partner x Sector x Calendar Month Fi
+> xed Effects (ps_month) <<<"
+
+>>> SPECIFICATION 14A: Controlling for Partner x Sector x Calendar Month Fixed Effects (ps
+> _month) <<<
+
+. reghdfe log_val treat_ex_china_2022, absorb(ps_month sector_period partner_period) vce(c
+> luster sector)
+(dropped 584 singleton observations)
+(MWFE estimator converged in 9 iterations)
+
+HDFE Linear regression                            Number of obs   =     25,040
+Absorbing 3 HDFE groups                           F(   1,    131) =      24.50
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.9667
+                                                  Adj R-squared   =     0.9285
+                                                  Within R-sq.    =     0.0065
+Number of clusters (sector)  =        132         Root MSE        =     0.7364
+
+                                      (Std. err. adjusted for 132 clusters in sector)
+-------------------------------------------------------------------------------------
+                    |               Robust
+            log_val | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+--------------------+----------------------------------------------------------------
+treat_ex_china_2022 |   1.515802   .3062384     4.95   0.000     .9099891    2.121614
+              _cons |   1.355943    .013089   103.59   0.000      1.33005    1.381836
+-------------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+--------------------------------------------------------+
+    Absorbed FE | Categories  - Redundant  = Num. Coefs |
+----------------+---------------------------------------|
+       ps_month |      8526        8526           0    *|
+  sector_period |      4643        4643           0    *|
+ partner_period |       216           1         215     |
+--------------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. di as txt "Seasonality-Controlled OLS (beta): beta = " as res %7.4f _b[treat_ex_china_20
+> 22] as txt " (SE = " as res %7.4f _se[treat_ex_china_2022] as txt ", p = " as res %6.4f 
+> 2*ttail(e(df_r), abs(_b[treat_ex_china_2022]/_se[treat_ex_china_2022])) as txt ")"
+Seasonality-Controlled OLS (beta): beta =  1.5158 (SE =  0.3062, p = 0.0000)
+
+. 
+. * Partner x sector unit-specific linear time trends (alpha_{is} * t)
+. gen int yr = floor(period / 100)
+
+. gen byte t_month = (yr - 2023)*12 + cal_month
+
+. di _newline ">>> SPECIFICATION 14B: Unit-Specific Linear Time Trends (partner_sector#c.t
+> _month) <<<"
+
+>>> SPECIFICATION 14B: Unit-Specific Linear Time Trends (partner_sector#c.t_month) <<<
+
+. reghdfe log_val treat_ex_china_2022, absorb(partner_sector partner_sector#c.t_month sect
+> or_period partner_period) vce(cluster sector)
+(dropped 80 singleton observations)
+(MWFE estimator converged in 82 iterations)
+
+HDFE Linear regression                            Number of obs   =     25,544
+Absorbing 4 HDFE groups                           F(   1,    132) =      15.48
+Statistics robust to heteroskedasticity           Prob > F        =     0.0001
+                                                  R-squared       =     0.9609
+                                                  Adj R-squared   =     0.9476
+                                                  Within R-sq.    =     0.0014
+Number of clusters (sector)  =        133         Root MSE        =     0.6461
+
+                                      (Std. err. adjusted for 133 clusters in sector)
+-------------------------------------------------------------------------------------
+                    |               Robust
+            log_val | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+--------------------+----------------------------------------------------------------
+treat_ex_china_2022 |   1.120916    .284871     3.93   0.000      .557413    1.684419
+              _cons |   1.275643   .0121811   104.72   0.000     1.251548    1.299739
+-------------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+------------------------------------------------------------------+
+              Absorbed FE | Categories  - Redundant  = Num. Coefs |
+--------------------------+---------------------------------------|
+           partner_sector |       784         784           0    *|
+ partner_sector#c.t_month |       784           0         784    ?|
+            sector_period |      4696        4696           0    *|
+           partner_period |       216           1         215     |
+------------------------------------------------------------------+
+? = number of redundant parameters may be higher
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. di as txt "Unit-Specific Trend-Controlled (beta): beta = " as res %7.4f _b[treat_ex_chin
+> a_2022] as txt " (SE = " as res %7.4f _se[treat_ex_china_2022] as txt ", p = " as res %6
+> .4f 2*ttail(e(df_r), abs(_b[treat_ex_china_2022]/_se[treat_ex_china_2022])) as txt ")"
+Unit-Specific Trend-Controlled (beta): beta =  1.1209 (SE =  0.2849, p = 0.0001)
+
+. 
 . log close
       name:  <unnamed>
-       log:  C:\Users\Zer0\Desktop\dd\final\replication_package\data\stata\../../results/multilateral_hs84_hs85_log.txt
+       log:  c:\Users\Zer0\Desktop\dd\replication_package\data\stata\../../results/multila
+> teral_hs84_hs85_log.txt
   log type:  text
- closed on:  19 Sep 2026, 00:17:45
-----------------------------------------------------------------------------------------------------------------------------------------
+ closed on:  13 Nov 2026, 02:45:26
+------------------------------------------------------------------------------------------

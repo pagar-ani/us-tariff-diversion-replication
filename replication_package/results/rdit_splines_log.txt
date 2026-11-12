@@ -1,8 +1,8 @@
-----------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------
       name:  <unnamed>
-       log:  C:\Users\Zer0\Desktop\dd\final\replication_package\data\stata\../../results/rdit_splines_log.txt
+       log:  c:\Users\Zer0\Desktop\dd\replication_package\data\stata\../../results/rdit_splines_log.txt
   log type:  text
- opened on:  19 Sep 2026, 00:17:45
+ opened on:  13 Nov 2026, 02:01:02
 
 . 
 . di _newline "========================================================================"
@@ -15,7 +15,7 @@ PART 0: VERIFY SSC PACKAGES & MATA COMPILATION
 . di "========================================================================"
 ========================================================================
 
-. foreach pkg in ftools reghdfe ppmlhdfe {
+. foreach pkg in require ftools reghdfe ppmlhdfe boottest {
   2.     cap which `pkg'
   3.     if _rc {
   4.         di "Installing `pkg' from SSC..."
@@ -25,9 +25,11 @@ PART 0: VERIFY SSC PACKAGES & MATA COMPILATION
   8.         di "`pkg' is already installed."
   9.     }
  10. }
+require is already installed.
 ftools is already installed.
 reghdfe is already installed.
 ppmlhdfe is already installed.
+boottest is already installed.
 
 . cap ftools, compile
 
@@ -52,7 +54,7 @@ PART 1: LOAD FULL POSITIVE UNIVERSE (N = 25,624)
 . use "panel_hs84_hs85_full_universe.dta", clear
 
 . 
-. * Auto-heal trade_value_m_usd and net_mass_mt if missing or in raw units
+. * Derive trade_value_m_usd and net_mass_mt if in raw units
 . cap confirm variable trade_value_m_usd
 
 . if _rc != 0 {
@@ -64,6 +66,12 @@ PART 1: LOAD FULL POSITIVE UNIVERSE (N = 25,624)
 .         cap confirm variable trade_value_usd
 .         if _rc == 0 {
 .             gen double trade_value_m_usd = trade_value_usd / 1000000
+.         }
+.         else {
+.             cap confirm variable primaryvalue
+.             if _rc == 0 {
+.                 gen double trade_value_m_usd = primaryvalue / 1000000
+.             }
 .         }
 .     }
 . }
@@ -89,153 +97,30 @@ PART 1: LOAD FULL POSITIVE UNIVERSE (N = 25,624)
 . }
 
 . 
-. * Construct ChinaShare_2022 if missing (self-healing 133-sector dictionary)
-. cap confirm variable china_share_2022
+. * Exogenous 2022 baseline China share merge
+. cap drop china_share_2022
 
-. if _rc != 0 {
-.     di as txt "Constructing china_share_2022 directly across all 133 sectors..."
-.     gen double china_share_2022 = 0.0
-.     qui replace china_share_2022 = 0.001362 if sector == "8401"
-.     qui replace china_share_2022 = 0.204746 if sector == "8402"
-.     qui replace china_share_2022 = 0.069118 if sector == "8403"
-.     qui replace china_share_2022 = 0.220320 if sector == "8404"
-.     qui replace china_share_2022 = 0.007326 if sector == "8405"
-.     qui replace china_share_2022 = 0.013277 if sector == "8406"
-.     qui replace china_share_2022 = 0.038839 if sector == "8407"
-.     qui replace china_share_2022 = 0.016834 if sector == "8408"
-.     qui replace china_share_2022 = 0.133044 if sector == "8409"
-.     qui replace china_share_2022 = 0.131667 if sector == "8410"
-.     qui replace china_share_2022 = 0.013738 if sector == "8411"
-.     qui replace china_share_2022 = 0.139400 if sector == "8412"
-.     qui replace china_share_2022 = 0.181888 if sector == "8413"
-.     qui replace china_share_2022 = 0.291094 if sector == "8414"
-.     qui replace china_share_2022 = 0.251250 if sector == "8415"
-.     qui replace china_share_2022 = 0.208828 if sector == "8416"
-.     qui replace china_share_2022 = 0.047134 if sector == "8417"
-.     qui replace china_share_2022 = 0.226028 if sector == "8418"
-.     qui replace china_share_2022 = 0.139011 if sector == "8419"
-.     qui replace china_share_2022 = 0.282176 if sector == "8420"
-.     qui replace china_share_2022 = 0.135534 if sector == "8421"
-.     qui replace china_share_2022 = 0.096666 if sector == "8422"
-.     qui replace china_share_2022 = 0.374949 if sector == "8423"
-.     qui replace china_share_2022 = 0.319682 if sector == "8424"
-.     qui replace china_share_2022 = 0.582066 if sector == "8425"
-.     qui replace china_share_2022 = 0.068950 if sector == "8426"
-.     qui replace china_share_2022 = 0.175373 if sector == "8427"
-.     qui replace china_share_2022 = 0.053047 if sector == "8428"
-.     qui replace china_share_2022 = 0.065241 if sector == "8429"
-.     qui replace china_share_2022 = 0.122416 if sector == "8430"
-.     qui replace china_share_2022 = 0.227717 if sector == "8431"
-.     qui replace china_share_2022 = 0.124529 if sector == "8432"
-.     qui replace china_share_2022 = 0.222105 if sector == "8433"
-.     qui replace china_share_2022 = 0.035582 if sector == "8434"
-.     qui replace china_share_2022 = 0.189425 if sector == "8435"
-.     qui replace china_share_2022 = 0.075620 if sector == "8436"
-.     qui replace china_share_2022 = 0.096698 if sector == "8437"
-.     qui replace china_share_2022 = 0.081651 if sector == "8438"
-.     qui replace china_share_2022 = 0.078618 if sector == "8439"
-.     qui replace china_share_2022 = 0.258066 if sector == "8440"
-.     qui replace china_share_2022 = 0.095639 if sector == "8441"
-.     qui replace china_share_2022 = 0.090980 if sector == "8442"
-.     qui replace china_share_2022 = 0.166263 if sector == "8443"
-.     qui replace china_share_2022 = 0.148527 if sector == "8444"
-.     qui replace china_share_2022 = 0.022711 if sector == "8445"
-.     qui replace china_share_2022 = 0.020847 if sector == "8446"
-.     qui replace china_share_2022 = 0.157277 if sector == "8447"
-.     qui replace china_share_2022 = 0.063877 if sector == "8448"
-.     qui replace china_share_2022 = 0.137597 if sector == "8449"
-.     qui replace china_share_2022 = 0.222977 if sector == "8450"
-.     qui replace china_share_2022 = 0.056004 if sector == "8451"
-.     qui replace china_share_2022 = 0.180513 if sector == "8452"
-.     qui replace china_share_2022 = 0.077495 if sector == "8453"
-.     qui replace china_share_2022 = 0.143467 if sector == "8454"
-.     qui replace china_share_2022 = 0.101119 if sector == "8455"
-.     qui replace china_share_2022 = 0.084216 if sector == "8456"
-.     qui replace china_share_2022 = 0.003902 if sector == "8457"
-.     qui replace china_share_2022 = 0.021602 if sector == "8458"
-.     qui replace china_share_2022 = 0.119796 if sector == "8459"
-.     qui replace china_share_2022 = 0.054263 if sector == "8460"
-.     qui replace china_share_2022 = 0.102343 if sector == "8461"
-.     qui replace china_share_2022 = 0.054741 if sector == "8462"
-.     qui replace china_share_2022 = 0.063994 if sector == "8463"
-.     qui replace china_share_2022 = 0.231972 if sector == "8464"
-.     qui replace china_share_2022 = 0.284957 if sector == "8465"
-.     qui replace china_share_2022 = 0.104923 if sector == "8466"
-.     qui replace china_share_2022 = 0.443847 if sector == "8467"
-.     qui replace china_share_2022 = 0.186455 if sector == "8468"
-.     qui replace china_share_2022 = 0.308052 if sector == "8470"
-.     qui replace china_share_2022 = 0.450441 if sector == "8471"
-.     qui replace china_share_2022 = 0.165287 if sector == "8472"
-.     qui replace china_share_2022 = 0.209347 if sector == "8473"
-.     qui replace china_share_2022 = 0.110977 if sector == "8474"
-.     qui replace china_share_2022 = 0.025213 if sector == "8475"
-.     qui replace china_share_2022 = 0.276661 if sector == "8476"
-.     qui replace china_share_2022 = 0.087378 if sector == "8477"
-.     qui replace china_share_2022 = 0.100810 if sector == "8478"
-.     qui replace china_share_2022 = 0.116116 if sector == "8479"
-.     qui replace china_share_2022 = 0.174614 if sector == "8480"
-.     qui replace china_share_2022 = 0.243959 if sector == "8481"
-.     qui replace china_share_2022 = 0.187632 if sector == "8482"
-.     qui replace china_share_2022 = 0.173828 if sector == "8483"
-.     qui replace china_share_2022 = 0.091329 if sector == "8484"
-.     qui replace china_share_2022 = 0.081848 if sector == "8485"
-.     qui replace china_share_2022 = 0.063995 if sector == "8486"
-.     qui replace china_share_2022 = 0.076404 if sector == "8487"
-.     qui replace china_share_2022 = 0.162154 if sector == "8501"
-.     qui replace china_share_2022 = 0.308297 if sector == "8502"
-.     qui replace china_share_2022 = 0.171938 if sector == "8503"
-.     qui replace china_share_2022 = 0.224950 if sector == "8504"
-.     qui replace china_share_2022 = 0.522000 if sector == "8505"
-.     qui replace china_share_2022 = 0.342774 if sector == "8506"
-.     qui replace china_share_2022 = 0.456795 if sector == "8507"
-.     qui replace china_share_2022 = 0.469465 if sector == "8508"
-.     qui replace china_share_2022 = 0.818215 if sector == "8509"
-.     qui replace china_share_2022 = 0.507591 if sector == "8510"
-.     qui replace china_share_2022 = 0.145021 if sector == "8511"
-.     qui replace china_share_2022 = 0.090619 if sector == "8512"
-.     qui replace china_share_2022 = 0.956456 if sector == "8513"
-.     qui replace china_share_2022 = 0.075509 if sector == "8514"
-.     qui replace china_share_2022 = 0.101437 if sector == "8515"
-.     qui replace china_share_2022 = 0.575674 if sector == "8516"
-.     qui replace china_share_2022 = 0.508369 if sector == "8517"
-.     qui replace china_share_2022 = 0.455103 if sector == "8518"
-.     qui replace china_share_2022 = 0.743680 if sector == "8519"
-.     qui replace china_share_2022 = 0.353741 if sector == "8521"
-.     qui replace china_share_2022 = 0.221387 if sector == "8522"
-.     qui replace china_share_2022 = 0.037261 if sector == "8523"
-.     qui replace china_share_2022 = 0.395620 if sector == "8524"
-.     qui replace china_share_2022 = 0.277012 if sector == "8525"
-.     qui replace china_share_2022 = 0.218815 if sector == "8526"
-.     qui replace china_share_2022 = 0.164739 if sector == "8527"
-.     qui replace china_share_2022 = 0.378462 if sector == "8528"
-.     qui replace china_share_2022 = 0.180024 if sector == "8529"
-.     qui replace china_share_2022 = 0.102395 if sector == "8530"
-.     qui replace china_share_2022 = 0.264259 if sector == "8531"
-.     qui replace china_share_2022 = 0.260493 if sector == "8532"
-.     qui replace china_share_2022 = 0.135261 if sector == "8533"
-.     qui replace china_share_2022 = 0.336589 if sector == "8534"
-.     qui replace china_share_2022 = 0.092403 if sector == "8535"
-.     qui replace china_share_2022 = 0.202667 if sector == "8536"
-.     qui replace china_share_2022 = 0.101151 if sector == "8537"
-.     qui replace china_share_2022 = 0.149572 if sector == "8538"
-.     qui replace china_share_2022 = 0.745875 if sector == "8539"
-.     qui replace china_share_2022 = 0.075201 if sector == "8540"
-.     qui replace china_share_2022 = 0.059852 if sector == "8541"
-.     qui replace china_share_2022 = 0.059818 if sector == "8542"
-.     qui replace china_share_2022 = 0.181216 if sector == "8543"
-.     qui replace china_share_2022 = 0.138414 if sector == "8544"
-.     qui replace china_share_2022 = 0.124268 if sector == "8545"
-.     qui replace china_share_2022 = 0.328853 if sector == "8546"
-.     qui replace china_share_2022 = 0.277253 if sector == "8547"
-.     qui replace china_share_2022 = 0.164570 if sector == "8548"
-. }
+. merge m:1 sector using "baseline_china_share_2022.dta", keepusing(china_share_2022)
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                            25,624  (_merge==3)
+    -----------------------------------------
+
+. keep if _merge == 3
+(0 observations deleted)
+
+. drop _merge
+
+. confirm variable china_share_2022
 
 . 
-. * Save enriched dataset (with china_share_2022) to tempfile for reuse in preserve blocks
+. * Save enriched dataset to tempfile for reuse in preserve blocks
 . tempfile enriched_universe
 
 . save `enriched_universe'
-file C:\Users\Zer0\AppData\Local\Temp\ST_473c_000001.tmp saved as .dta format
+file E:\Cache\Temp\ST_b4a8_000001.tmp saved as .dta format
 
 . 
 . * 1. Temporal Running Variable (1 to 36)
@@ -288,15 +173,25 @@ file C:\Users\Zer0\AppData\Local\Temp\ST_473c_000001.tmp saved as .dta format
 . gen double Dis_Slope = Dis * t_centered * d_post
 
 . 
+. cap drop log_val
+
+. * Clean positive flow log transformation without arbitrary floor
 . cap confirm variable trade_value_m_usd
 
 . if _rc != 0 {
-.     cap gen double trade_value_m_usd = val_usd / 1000000
+.     cap confirm variable val_usd
+.     if _rc == 0 gen double trade_value_m_usd = val_usd / 1000000
+.     else {
+.         cap confirm variable trade_value_usd
+.         if _rc == 0 gen double trade_value_m_usd = trade_value_usd / 1000000
+.         else {
+.             cap confirm variable primaryvalue
+.             if _rc == 0 gen double trade_value_m_usd = primaryvalue / 1000000
+.         }
+.     }
 . }
 
-. cap drop log_val
-
-. gen double log_val = ln(max(trade_value_m_usd, 0.001))
+. gen double log_val = ln(trade_value_m_usd) if trade_value_m_usd > 0 & !missing(trade_value_m_usd)
 
 . 
 . foreach v in partner_sector sector_period partner_period {
@@ -361,14 +256,14 @@ Absorbed degrees of freedom:
 
 . local se_trend = _se[Dis_trend_lin]
 
-. local p_trend = 2 * (1 - normal(abs(`b_trend'/`se_trend')))
+. local p_trend = 2 * ttail(e(df_r), abs(`b_trend'/`se_trend'))
 
 . 
 . local b_early = _b[Dis_Early]
 
 . local se_early = _se[Dis_Early]
 
-. local p_early = 2 * (1 - normal(abs(`b_early'/`se_early')))
+. local p_early = 2 * ttail(e(df_r), abs(`b_early'/`se_early'))
 
 . 
 . local b_step = _b[Dis_Step]
@@ -377,14 +272,14 @@ Absorbed degrees of freedom:
 
 . local t_step = `b_step' / `se_step'
 
-. local p_step = 2 * (1 - normal(abs(`t_step')))
+. local p_step = 2 * ttail(e(df_r), abs(`t_step'))
 
 . 
 . local b_slope = _b[Dis_Slope]
 
 . local se_slope = _se[Dis_Slope]
 
-. local p_slope = 2 * (1 - normal(abs(`b_slope'/`se_slope')))
+. local p_slope = 2 * ttail(e(df_r), abs(`b_slope'/`se_slope'))
 
 . 
 . di as txt _newline ">>> MODEL 1 ESTIMATION SUMMARY (SECTOR CLUSTERED) <<<"
@@ -394,21 +289,21 @@ Absorbed degrees of freedom:
 . di as txt "  N:                                " as res e(N)
   N:                                25544
 
-. di as txt "  Secular Drift Slope (theta_1):   " as res %7.4f `b_trend' as txt " (SE = " as res %7.4f `se_trend' as txt ", p = " as res
->  %6.4f `p_trend' as txt ")"
-  Secular Drift Slope (theta_1):    0.0100 (SE =  0.0124, p = 0.4191)
+. di as txt "  Secular Drift Slope (theta_1):   " as res %7.4f `b_trend' as txt " (SE = " as res %7.4f `se_trend' as txt ", p = " as res %6.4f `p
+> _trend' as txt ")"
+  Secular Drift Slope (theta_1):    0.0100 (SE =  0.0124, p = 0.4205)
 
-. di as txt "  Announcement Phase (delta_Early): " as res %7.4f `b_early' as txt " (SE = " as res %7.4f `se_early' as txt ", p = " as re
-> s %6.4f `p_early' as txt ")"
-  Announcement Phase (delta_Early):  0.9375 (SE =  0.3094, p = 0.0024)
+. di as txt "  Announcement Phase (delta_Early): " as res %7.4f `b_early' as txt " (SE = " as res %7.4f `se_early' as txt ", p = " as res %6.4f `
+> p_early' as txt ")"
+  Announcement Phase (delta_Early):  0.9375 (SE =  0.3094, p = 0.0029)
 
-. di as txt "  Enforcement Step Jump (delta):    " as res %7.4f `b_step' as txt " (SE = " as res %7.4f `se_step' as txt ", t = " as res 
-> %5.2f `t_step' as txt ", p = " as res %6.4f `p_step' as txt ")"
+. di as txt "  Enforcement Step Jump (delta):    " as res %7.4f `b_step' as txt " (SE = " as res %7.4f `se_step' as txt ", t = " as res %5.2f `t_
+> step' as txt ", p = " as res %6.4f `p_step' as txt ")"
   Enforcement Step Jump (delta):     1.3673 (SE =  0.2980, t =  4.59, p = 0.0000)
 
-. di as txt "  Slope Acceleration (kappa):       " as res %7.4f `b_slope' as txt " (SE = " as res %7.4f `se_slope' as txt ", p = " as re
-> s %6.4f `p_slope' as txt ")"
-  Slope Acceleration (kappa):        0.0406 (SE =  0.0908, p = 0.6544)
+. di as txt "  Slope Acceleration (kappa):       " as res %7.4f `b_slope' as txt " (SE = " as res %7.4f `se_slope' as txt ", p = " as res %6.4f `
+> p_slope' as txt ")"
+  Slope Acceleration (kappa):        0.0406 (SE =  0.0908, p = 0.6552)
 
 . 
 . test Dis_Step Dis_Slope
@@ -463,9 +358,9 @@ Absorbed degrees of freedom:
 --------------------------------------------------------+
 * = FE nested within cluster; treated as redundant for DoF computation
 
-. di as txt "  Two-Way SE on Step Jump (delta): SE = " as res %7.4f _se[Dis_Step] as txt ", p = " as res %6.4f 2*(1-normal(abs(_b[Dis_St
-> ep]/_se[Dis_Step])))
-  Two-Way SE on Step Jump (delta): SE =  0.2562, p = 0.0000
+. di as txt "  Two-Way SE on Step Jump (delta): [SE = " as res %7.4f _se[Dis_Step] as txt "], p = " as res %6.4f 2*ttail(e(df_r), abs(_b[Dis_Step
+> ]/_se[Dis_Step]))
+  Two-Way SE on Step Jump (delta): [SE =  0.2562], p = 0.0031
 
 . 
 . di _newline "========================================================================"
@@ -519,25 +414,37 @@ Absorbed degrees of freedom:
 . di as txt "  N:                                " as res e(N)
   N:                                25544
 
-. di as txt "  Linear Drift Slope (theta_1):     " as res %7.4f _b[Dis_trend_lin] as txt " (SE = " as res %7.4f _se[Dis_trend_lin] as tx
-> t ", p = " as res %6.4f 2*(1-normal(abs(_b[Dis_trend_lin]/_se[Dis_trend_lin]))) as txt ")"
-  Linear Drift Slope (theta_1):      0.0791 (SE =  0.0406, p = 0.0514)
+. di as txt "  Linear Drift Slope (theta_1):     " as res %7.4f _b[Dis_trend_lin] as txt " (SE = " as res %7.4f _se[Dis_trend_lin] as txt ", p = 
+> " as res %6.4f 2*ttail(e(df_r), abs(_b[Dis_trend_lin]/_se[Dis_trend_lin])) as txt ")"
+  Linear Drift Slope (theta_1):      0.0791 (SE =  0.0406, p = 0.0535)
 
-. di as txt "  Quadratic Term (theta_2):         " as res %7.4f _b[Dis_trend_sq]  as txt " (SE = " as res %7.4f _se[Dis_trend_sq]  as tx
-> t ", p = " as res %6.4f 2*(1-normal(abs(_b[Dis_trend_sq]/_se[Dis_trend_sq]))) as txt ")"
-  Quadratic Term (theta_2):          0.0020 (SE =  0.0012, p = 0.0848)
+. di as txt "  Quadratic Term (theta_2):         " as res %7.4f _b[Dis_trend_sq]  as txt " (SE = " as res %7.4f _se[Dis_trend_sq]  as txt ", p = 
+> " as res %6.4f 2*ttail(e(df_r), abs(_b[Dis_trend_sq]/_se[Dis_trend_sq])) as txt ")"
+  Quadratic Term (theta_2):          0.0020 (SE =  0.0012, p = 0.0871)
 
-. di as txt "  Announcement Phase (delta_Early): " as res %7.4f _b[Dis_Early]     as txt " (SE = " as res %7.4f _se[Dis_Early]     as tx
-> t ", p = " as res %6.4f 2*(1-normal(abs(_b[Dis_Early]/_se[Dis_Early]))) as txt ")"
-  Announcement Phase (delta_Early):  0.6027 (SE =  0.2661, p = 0.0235)
+. di as txt "  Announcement Phase (delta_Early): " as res %7.4f _b[Dis_Early]     as txt " (SE = " as res %7.4f _se[Dis_Early]     as txt ", p = 
+> " as res %6.4f 2*ttail(e(df_r), abs(_b[Dis_Early]/_se[Dis_Early])) as txt ")"
+  Announcement Phase (delta_Early):  0.6027 (SE =  0.2661, p = 0.0251)
 
-. di as txt "  Enforcement Step Jump (delta):    " as res %7.4f _b[Dis_Step]      as txt " (SE = " as res %7.4f _se[Dis_Step]      as tx
-> t ", p = " as res %6.4f 2*(1-normal(abs(_b[Dis_Step]/_se[Dis_Step]))) as txt ")"
-  Enforcement Step Jump (delta):     0.9106 (SE =  0.3196, p = 0.0044)
+. di as txt "  Enforcement Step Jump (delta):    " as res %7.4f _b[Dis_Step]      as txt " (SE = " as res %7.4f _se[Dis_Step]      as txt ", p = 
+> " as res %6.4f 2*ttail(e(df_r), abs(_b[Dis_Step]/_se[Dis_Step])) as txt ")"
+  Enforcement Step Jump (delta):     0.9106 (SE =  0.3196, p = 0.0051)
 
-. di as txt "  Slope Acceleration (kappa):       " as res %7.4f _b[Dis_Slope]     as txt " (SE = " as res %7.4f _se[Dis_Slope]     as tx
-> t ", p = " as res %6.4f 2*(1-normal(abs(_b[Dis_Slope]/_se[Dis_Slope]))) as txt ")"
-  Slope Acceleration (kappa):       -0.0387 (SE =  0.1082, p = 0.7209)
+. di as txt "  Slope Acceleration (kappa):       " as res %7.4f _b[Dis_Slope]     as txt " (SE = " as res %7.4f _se[Dis_Slope]     as txt ", p = 
+> " as res %6.4f 2*ttail(e(df_r), abs(_b[Dis_Slope]/_se[Dis_Slope])) as txt ")"
+  Slope Acceleration (kappa):       -0.0387 (SE =  0.1082, p = 0.7214)
+
+. 
+. test Dis_Step Dis_Slope
+
+ ( 1)  Dis_Step = 0
+ ( 2)  Dis_Slope = 0
+
+       F(  2,   132) =    4.26
+            Prob > F =    0.0162
+
+. di as txt "  Joint Wald Test (delta = 0 & kappa = 0): F = " as res %5.2f r(F) as txt ", p = " as res %8.6f r(p)
+  Joint Wald Test (delta = 0 & kappa = 0): F =  4.26, p = 0.016155
 
 . 
 . di _newline "========================================================================"
@@ -594,21 +501,33 @@ Absorbed degrees of freedom:
 .     di as txt "  N:                                " as res e(N)
   N:                                25112
 
-.     di as txt "  Non-Tech Secular Drift (theta_1): " as res %7.4f _b[Dis_trend_lin] as txt " (SE = " as res %7.4f _se[Dis_trend_lin] a
-> s txt ", p = " as res %6.4f 2*(1-normal(abs(_b[Dis_trend_lin]/_se[Dis_trend_lin]))) as txt ")"
-  Non-Tech Secular Drift (theta_1):  0.0067 (SE =  0.0125, p = 0.5943)
+.     di as txt "  Non-Tech Secular Drift (theta_1): " as res %7.4f _b[Dis_trend_lin] as txt " (SE = " as res %7.4f _se[Dis_trend_lin] as txt ", 
+> p = " as res %6.4f 2*ttail(e(df_r), abs(_b[Dis_trend_lin]/_se[Dis_trend_lin])) as txt ")"
+  Non-Tech Secular Drift (theta_1):  0.0067 (SE =  0.0125, p = 0.5952)
 
-.     di as txt "  Non-Tech Announcement (delta_E):  " as res %7.4f _b[Dis_Early]     as txt " (SE = " as res %7.4f _se[Dis_Early]     a
-> s txt ", p = " as res %6.4f 2*(1-normal(abs(_b[Dis_Early]/_se[Dis_Early]))) as txt ")"
-  Non-Tech Announcement (delta_E):   0.7730 (SE =  0.2742, p = 0.0048)
+.     di as txt "  Non-Tech Announcement (delta_E):  " as res %7.4f _b[Dis_Early]     as txt " (SE = " as res %7.4f _se[Dis_Early]     as txt ", 
+> p = " as res %6.4f 2*ttail(e(df_r), abs(_b[Dis_Early]/_se[Dis_Early])) as txt ")"
+  Non-Tech Announcement (delta_E):   0.7730 (SE =  0.2742, p = 0.0056)
 
-.     di as txt "  Non-Tech OLS Step Jump (delta):   " as res %7.4f _b[Dis_Step]      as txt " (SE = " as res %7.4f _se[Dis_Step]      a
-> s txt ", p = " as res %6.4f 2*(1-normal(abs(_b[Dis_Step]/_se[Dis_Step]))) as txt ")"
+.     di as txt "  Non-Tech OLS Step Jump (delta):   " as res %7.4f _b[Dis_Step]      as txt " (SE = " as res %7.4f _se[Dis_Step]      as txt ", 
+> p = " as res %6.4f 2*ttail(e(df_r), abs(_b[Dis_Step]/_se[Dis_Step])) as txt ")"
   Non-Tech OLS Step Jump (delta):    1.1741 (SE =  0.2514, p = 0.0000)
 
-.     di as txt "  Non-Tech Slope Accel (kappa):     " as res %7.4f _b[Dis_Slope]     as txt " (SE = " as res %7.4f _se[Dis_Slope]     a
-> s txt ", p = " as res %6.4f 2*(1-normal(abs(_b[Dis_Slope]/_se[Dis_Slope]))) as txt ")"
-  Non-Tech Slope Accel (kappa):      0.0544 (SE =  0.0931, p = 0.5589)
+.     di as txt "  Non-Tech Slope Accel (kappa):     " as res %7.4f _b[Dis_Slope]     as txt " (SE = " as res %7.4f _se[Dis_Slope]     as txt ", 
+> p = " as res %6.4f 2*ttail(e(df_r), abs(_b[Dis_Slope]/_se[Dis_Slope])) as txt ")"
+  Non-Tech Slope Accel (kappa):      0.0544 (SE =  0.0931, p = 0.5599)
+
+.     
+.     test Dis_Step Dis_Slope
+
+ ( 1)  Dis_Step = 0
+ ( 2)  Dis_Slope = 0
+
+       F(  2,   130) =   12.77
+            Prob > F =    0.0000
+
+.     di as txt "  Joint Wald Test (delta = 0 & kappa = 0): F = " as res %5.2f r(F) as txt ", p = " as res %8.6f r(p)
+  Joint Wald Test (delta = 0 & kappa = 0): F = 12.77, p = 0.000009
 
 . restore
 
@@ -629,7 +548,26 @@ PART 2: LOAD BALANCED PANEL WITH TRUE ZEROS (N = 28,728)
 . use "panel_hs84_hs85_balanced_with_zeros.dta", clear
 
 . 
-. * Auto-heal trade_value_m_usd if missing or in raw units
+. * Exogenous 2022 baseline China share merge
+. cap drop china_share_2022
+
+. merge m:1 sector using "baseline_china_share_2022.dta", keepusing(china_share_2022)
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                            28,728  (_merge==3)
+    -----------------------------------------
+
+. keep if _merge == 3
+(0 observations deleted)
+
+. drop _merge
+
+. confirm variable china_share_2022
+
+. 
+. * Derive trade_value_m_usd if in raw units
 . cap confirm variable trade_value_m_usd
 
 . if _rc != 0 {
@@ -690,31 +628,95 @@ MODEL 4: HIGH-DIMENSIONAL PPML ON TRADE LEVELS (TRUE-ZEROS BALANCED PANEL)
 . di "========================================================================"
 ========================================================================
 
-. cap ppmlhdfe trade_value_m_usd Dis_trend_lin_b Dis_Early_b Dis_Step_b Dis_Slope_b, ///
+. ppmlhdfe trade_value_m_usd Dis_trend_lin_b Dis_Early_b Dis_Step_b Dis_Slope_b, ///
 >     absorb(partner_sector_b sector_period_b partner_period_b) ///
 >     vce(cluster sector)
+(dropped 375 observations that are either singletons or separated by a fixed effect)
+Iteration 1:   deviance = 6.0764e+05  eps = .         iters = 5    tol = 1.0e-04  min(eta) =  -3.85  P   
+Iteration 2:   deviance = 2.0861e+05  eps = 1.91e+00  iters = 5    tol = 1.0e-04  min(eta) =  -5.29      
+Iteration 3:   deviance = 1.2744e+05  eps = 6.37e-01  iters = 5    tol = 1.0e-04  min(eta) =  -6.92      
+Iteration 4:   deviance = 1.0649e+05  eps = 1.97e-01  iters = 5    tol = 1.0e-04  min(eta) =  -8.37      
+Iteration 5:   deviance = 1.0101e+05  eps = 5.43e-02  iters = 4    tol = 1.0e-04  min(eta) =  -9.25      
+Iteration 6:   deviance = 9.9595e+04  eps = 1.42e-02  iters = 3    tol = 1.0e-04  min(eta) = -10.08      
+Iteration 7:   deviance = 9.9233e+04  eps = 3.65e-03  iters = 3    tol = 1.0e-04  min(eta) = -11.34      
+Iteration 8:   deviance = 9.9142e+04  eps = 9.17e-04  iters = 3    tol = 1.0e-04  min(eta) = -12.44      
+Iteration 9:   deviance = 9.9120e+04  eps = 2.25e-04  iters = 2    tol = 1.0e-04  min(eta) = -13.80      
+Iteration 10:  deviance = 9.9115e+04  eps = 4.99e-05  iters = 2    tol = 1.0e-04  min(eta) = -15.58      
+Iteration 11:  deviance = 9.9114e+04  eps = 9.50e-06  iters = 2    tol = 1.0e-05  min(eta) = -17.32      
+Iteration 12:  deviance = 9.9114e+04  eps = 1.66e-06  iters = 3    tol = 1.0e-06  min(eta) = -18.75   S  
+Iteration 13:  deviance = 9.9113e+04  eps = 2.50e-07  iters = 2    tol = 1.0e-06  min(eta) = -19.68   S  
+Iteration 14:  deviance = 9.9113e+04  eps = 2.64e-08  iters = 2    tol = 1.0e-07  min(eta) = -20.08   S  
+Iteration 15:  deviance = 9.9113e+04  eps = 1.16e-09  iters = 3    tol = 1.0e-08  min(eta) = -20.16   S O
+------------------------------------------------------------------------------------------------------------
+(legend: p: exact partial-out   s: exact solver   h: step-halving   o: epsilon below tolerance)
+Converged in 15 iterations and 49 HDFE sub-iterations (tol = 1.0e-08)
+
+HDFE PPML regression                              No. of obs      =     28,353
+Absorbing 3 HDFE groups                           Residual df     =        132
+Statistics robust to heteroskedasticity           Wald chi2(4)    =      81.75
+Deviance             =  99113.47958               Prob > chi2     =     0.0000
+Log pseudolikelihood = -94466.78284               Pseudo R2       =     0.9792
+
+Number of clusters (sector) =        133
+                                  (Std. err. adjusted for 133 clusters in sector)
+---------------------------------------------------------------------------------
+                |               Robust
+trade_value_m~d | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+----------------+----------------------------------------------------------------
+Dis_trend_lin_b |   .0417911   .0418122     1.00   0.318    -.0401593    .1237415
+    Dis_Early_b |   3.039543   .5333129     5.70   0.000     1.994269    4.084817
+     Dis_Step_b |    2.62589   .6051961     4.34   0.000     1.439727    3.812053
+    Dis_Slope_b |  -.1341143   .0975913    -1.37   0.169    -.3253898    .0571612
+          _cons |   6.360645   .0540905   117.59   0.000     6.254629     6.46666
+---------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+----------------------------------------------------------+
+      Absorbed FE | Categories  - Redundant  = Num. Coefs |
+------------------+---------------------------------------|
+ partner_sector_b |       790         790           0    *|
+  sector_period_b |      4770        4770           0    *|
+ partner_period_b |       216           1         215     |
+----------------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
 
 . 
-. if _rc == 0 {
-.     di as txt "  N:                                " as res e(N)
+. di as txt "  N:                                " as res e(N)
   N:                                28353
-.     di as txt "  PPML Secular Drift Slope (theta_1):" as res %7.4f _b[Dis_trend_lin_b] as txt " (SE = " as res %7.4f _se[Dis_trend_lin
-> _b] as txt ", p = " as res %6.4f 2*(1-normal(abs(_b[Dis_trend_lin_b]/_se[Dis_trend_lin_b]))) as txt ")"
+
+. di as txt "  PPML Secular Drift Slope (theta_1):" as res %7.4f _b[Dis_trend_lin_b] as txt " (SE = " as res %7.4f _se[Dis_trend_lin_b] as txt ",
+>  p = " as res %6.4f 2*(1 - normal(abs(_b[Dis_trend_lin_b]/_se[Dis_trend_lin_b]))) as txt ")"
   PPML Secular Drift Slope (theta_1): 0.0418 (SE =  0.0418, p = 0.3176)
-.     di as txt "  PPML Announcement Phase (delta_E): " as res %7.4f _b[Dis_Early_b]     as txt " (SE = " as res %7.4f _se[Dis_Early_b] 
->     as txt ", p = " as res %6.4f 2*(1-normal(abs(_b[Dis_Early_b]/_se[Dis_Early_b]))) as txt ")"
+
+. di as txt "  PPML Announcement Phase (delta_E): " as res %7.4f _b[Dis_Early_b]     as txt " (SE = " as res %7.4f _se[Dis_Early_b]     as txt ",
+>  p = " as res %6.4f 2*(1 - normal(abs(_b[Dis_Early_b]/_se[Dis_Early_b]))) as txt ")"
   PPML Announcement Phase (delta_E):  3.0395 (SE =  0.5333, p = 0.0000)
-.     di as txt "  PPML Step Jump (delta):            " as res %7.4f _b[Dis_Step_b]      as txt " (SE = " as res %7.4f _se[Dis_Step_b]  
->     as txt ", p = " as res %6.4f 2*(1-normal(abs(_b[Dis_Step_b]/_se[Dis_Step_b]))) as txt ")"
+
+. di as txt "  PPML Step Jump (delta):            " as res %7.4f _b[Dis_Step_b]      as txt " (SE = " as res %7.4f _se[Dis_Step_b]      as txt ",
+>  p = " as res %6.4f 2*(1 - normal(abs(_b[Dis_Step_b]/_se[Dis_Step_b]))) as txt ")"
   PPML Step Jump (delta):             2.6259 (SE =  0.6052, p = 0.0000)
-.     di as txt "  PPML Slope Acceleration (kappa):   " as res %7.4f _b[Dis_Slope_b]     as txt " (SE = " as res %7.4f _se[Dis_Slope_b] 
->     as txt ", p = " as res %6.4f 2*(1-normal(abs(_b[Dis_Slope_b]/_se[Dis_Slope_b]))) as txt ")"
+
+. di as txt "  PPML Slope Acceleration (kappa):   " as res %7.4f _b[Dis_Slope_b]     as txt " (SE = " as res %7.4f _se[Dis_Slope_b]     as txt ",
+>  p = " as res %6.4f 2*(1 - normal(abs(_b[Dis_Slope_b]/_se[Dis_Slope_b]))) as txt ")"
   PPML Slope Acceleration (kappa):   -0.1341 (SE =  0.0976, p = 0.1694)
-.     
-.     * Two-way clustering
-.     ppmlhdfe trade_value_m_usd Dis_trend_lin_b Dis_Early_b Dis_Step_b Dis_Slope_b, ///
->         absorb(partner_sector_b sector_period_b partner_period_b) ///
->         vce(cluster partner_iso sector)
+
+. 
+. test Dis_Step_b Dis_Slope_b
+
+ ( 1)  Dis_Step_b = 0
+ ( 2)  Dis_Slope_b = 0
+
+           chi2(  2) =   18.90
+         Prob > chi2 =    0.0001
+
+. di as txt "  Joint Wald Test (delta = 0 & kappa = 0): chi2(2) = " as res %5.2f r(chi2) as txt ", p = " as res %8.6f r(p)
+  Joint Wald Test (delta = 0 & kappa = 0): chi2(2) = 18.90, p = 0.000079
+
+. 
+. * Two-way clustering
+. ppmlhdfe trade_value_m_usd Dis_trend_lin_b Dis_Early_b Dis_Step_b Dis_Slope_b, ///
+>     absorb(partner_sector_b sector_period_b partner_period_b) ///
+>     vce(cluster partner_iso sector)
 (dropped 375 observations that are either singletons or separated by a fixed effect)
 Iteration 1:   deviance = 6.0764e+05  eps = .         iters = 5    tol = 1.0e-04  min(eta) =  -3.85  P   
 Iteration 2:   deviance = 2.0861e+05  eps = 1.91e+00  iters = 5    tol = 1.0e-04  min(eta) =  -5.29      
@@ -766,15 +768,10 @@ Absorbed degrees of freedom:
  partner_period_b |       216         216           0    *|
 ----------------------------------------------------------+
 * = FE nested within cluster; treated as redundant for DoF computation
-.     di as txt "  PPML Two-Way SE on Step Jump:     SE = " as res %7.4f _se[Dis_Step_b] as txt ", p = " as res %6.4f 2*(1-normal(abs(_b
-> [Dis_Step_b]/_se[Dis_Step_b])))
-  PPML Two-Way SE on Step Jump:     SE =  0.4101, p = 0.0000
-. }
 
-. else {
-.     di as txt "Note: ppmlhdfe verified via Python pyfixest fepois (N = 28,353, delta = 2.6259, SE = 0.6075, p < 0.0001; 2-way SE = 0.3
-> 993, p < 0.0001)."
-. }
+. di as txt "  PPML Two-Way SE on Step Jump:     [SE = " as res %7.4f _se[Dis_Step_b] as txt "], p = " as res %6.4f 2*ttail(5, abs(_b[Dis_Step_b]
+> /_se[Dis_Step_b]))
+  PPML Two-Way SE on Step Jump:     [SE =  0.4101], p = 0.0014
 
 . 
 . di _newline "========================================================================"
@@ -792,35 +789,152 @@ MODEL 5: NON-TECH PPML ON TRADE LEVELS (TRUE ZEROS, EXCL. 8471 & 8517)
 .     drop if inlist(sector, "8471", "8517")
 (432 observations deleted)
 
-.     cap ppmlhdfe trade_value_m_usd Dis_trend_lin_b Dis_Early_b Dis_Step_b Dis_Slope_b, ///
+.     ppmlhdfe trade_value_m_usd Dis_trend_lin_b Dis_Early_b Dis_Step_b Dis_Slope_b, ///
 >         absorb(partner_sector_b sector_period_b partner_period_b) ///
 >         vce(cluster sector)
+(dropped 375 observations that are either singletons or separated by a fixed effect)
+Iteration 1:   deviance = 2.8146e+05  eps = .         iters = 6    tol = 1.0e-04  min(eta) =  -3.51  P   
+Iteration 2:   deviance = 9.5468e+04  eps = 1.95e+00  iters = 6    tol = 1.0e-04  min(eta) =  -4.82      
+Iteration 3:   deviance = 5.6192e+04  eps = 6.99e-01  iters = 5    tol = 1.0e-04  min(eta) =  -6.14      
+Iteration 4:   deviance = 4.5827e+04  eps = 2.26e-01  iters = 4    tol = 1.0e-04  min(eta) =  -7.61      
+Iteration 5:   deviance = 4.3117e+04  eps = 6.29e-02  iters = 4    tol = 1.0e-04  min(eta) =  -8.85      
+Iteration 6:   deviance = 4.2419e+04  eps = 1.64e-02  iters = 4    tol = 1.0e-04  min(eta) =  -9.76      
+Iteration 7:   deviance = 4.2242e+04  eps = 4.19e-03  iters = 3    tol = 1.0e-04  min(eta) = -10.93      
+Iteration 8:   deviance = 4.2198e+04  eps = 1.05e-03  iters = 2    tol = 1.0e-04  min(eta) = -12.09      
+Iteration 9:   deviance = 4.2187e+04  eps = 2.48e-04  iters = 2    tol = 1.0e-04  min(eta) = -13.79      
+Iteration 10:  deviance = 4.2185e+04  eps = 5.05e-05  iters = 2    tol = 1.0e-04  min(eta) = -15.55      
+Iteration 11:  deviance = 4.2185e+04  eps = 9.19e-06  iters = 2    tol = 1.0e-05  min(eta) = -17.18      
+Iteration 12:  deviance = 4.2185e+04  eps = 1.51e-06  iters = 2    tol = 1.0e-06  min(eta) = -18.38   S  
+Iteration 13:  deviance = 4.2185e+04  eps = 1.98e-07  iters = 2    tol = 1.0e-06  min(eta) = -19.02   S  
+Iteration 14:  deviance = 4.2185e+04  eps = 1.46e-08  iters = 2    tol = 1.0e-07  min(eta) = -19.23   S  
+Iteration 15:  deviance = 4.2185e+04  eps = 2.83e-10  iters = 2    tol = 1.0e-08  min(eta) = -19.25   S  
+Iteration 16:  deviance = 4.2185e+04  eps = 2.66e-13  iters = 2    tol = 1.0e-09  min(eta) = -19.25   S O
+------------------------------------------------------------------------------------------------------------
+(legend: p: exact partial-out   s: exact solver   h: step-halving   o: epsilon below tolerance)
+Converged in 16 iterations and 50 HDFE sub-iterations (tol = 1.0e-08)
 
-.     if _rc == 0 {
-.         di as txt "  N:                                " as res e(N)
+HDFE PPML regression                              No. of obs      =     27,921
+Absorbing 3 HDFE groups                           Residual df     =        130
+Statistics robust to heteroskedasticity           Wald chi2(4)    =      50.37
+Deviance             =  42184.74833               Prob > chi2     =     0.0000
+Log pseudolikelihood = -64140.17485               Pseudo R2       =     0.9696
+
+Number of clusters (sector) =        131
+                                  (Std. err. adjusted for 131 clusters in sector)
+---------------------------------------------------------------------------------
+                |               Robust
+trade_value_m~d | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+----------------+----------------------------------------------------------------
+Dis_trend_lin_b |   -.006771   .0114004    -0.59   0.553    -.0291153    .0155734
+    Dis_Early_b |   1.211505   .2024898     5.98   0.000      .814632    1.608377
+     Dis_Step_b |   1.327383    .336368     3.95   0.000     .6681136    1.986652
+    Dis_Slope_b |   .0217991   .0359263     0.61   0.544    -.0486151    .0922133
+          _cons |   5.431302   .0217088   250.19   0.000     5.388753     5.47385
+---------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+----------------------------------------------------------+
+      Absorbed FE | Categories  - Redundant  = Num. Coefs |
+------------------+---------------------------------------|
+ partner_sector_b |       778         778           0    *|
+  sector_period_b |      4698        4698           0    *|
+ partner_period_b |       216           1         215     |
+----------------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+.     di as txt "  N:                                " as res e(N)
   N:                                27921
-.         di as txt "  Non-Tech PPML Drift Slope (theta):" as res %7.4f _b[Dis_trend_lin_b] as txt " (SE = " as res %7.4f _se[Dis_trend_
-> lin_b] as txt ", p = " as res %6.4f 2*(1-normal(abs(_b[Dis_trend_lin_b]/_se[Dis_trend_lin_b]))) as txt ")"
-  Non-Tech PPML Drift Slope (theta):-0.0068 (SE =  0.0114, p = 0.5526)
-.         di as txt "  Non-Tech PPML Early Phase (delta):" as res %7.4f _b[Dis_Early_b]     as txt " (SE = " as res %7.4f _se[Dis_Early_
-> b]     as txt ", p = " as res %6.4f 2*(1-normal(abs(_b[Dis_Early_b]/_se[Dis_Early_b]))) as txt ")"
-  Non-Tech PPML Early Phase (delta): 1.2115 (SE =  0.2025, p = 0.0000)
-.         di as txt "  Non-Tech PPML Step Jump (delta):  " as res %7.4f _b[Dis_Step_b]      as txt " (SE = " as res %7.4f _se[Dis_Step_b
-> ]      as txt ", p = " as res %6.4f 2*(1-normal(abs(_b[Dis_Step_b]/_se[Dis_Step_b]))) as txt ")"
-  Non-Tech PPML Step Jump (delta):   1.3274 (SE =  0.3364, p = 0.0001)
-.         di as txt "  Non-Tech PPML Slope Accel (kappa):" as res %7.4f _b[Dis_Slope_b]     as txt " (SE = " as res %7.4f _se[Dis_Slope_
-> b]     as txt ", p = " as res %6.4f 2*(1-normal(abs(_b[Dis_Slope_b]/_se[Dis_Slope_b]))) as txt ")"
-  Non-Tech PPML Slope Accel (kappa): 0.0218 (SE =  0.0359, p = 0.5440)
-.     }
 
-.     else {
-.         di as txt "Note: Non-Tech PPML verified via Python pyfixest fepois (N = 27,921, delta = 1.3274, SE = 0.3377, p = 0.0001; 2-way
->  SE = 0.4123, p = 0.0013)."
-.     }
+.     di as txt "  Non-Tech PPML Drift Slope (theta):" as res %7.4f _b[Dis_trend_lin_b] as txt " (SE = " as res %7.4f _se[Dis_trend_lin_b] as txt
+>  ", p = " as res %6.4f 2*(1 - normal(abs(_b[Dis_trend_lin_b]/_se[Dis_trend_lin_b]))) as txt ")"
+  Non-Tech PPML Drift Slope (theta):-0.0068 (SE =  0.0114, p = 0.5526)
+
+.     di as txt "  Non-Tech PPML Early Phase (delta):" as res %7.4f _b[Dis_Early_b]     as txt " (SE = " as res %7.4f _se[Dis_Early_b]     as txt
+>  ", p = " as res %6.4f 2*(1 - normal(abs(_b[Dis_Early_b]/_se[Dis_Early_b]))) as txt ")"
+  Non-Tech PPML Early Phase (delta): 1.2115 (SE =  0.2025, p = 0.0000)
+
+.     di as txt "  Non-Tech PPML Step Jump (delta):  " as res %7.4f _b[Dis_Step_b]      as txt " (SE = " as res %7.4f _se[Dis_Step_b]      as txt
+>  ", p = " as res %6.4f 2*(1 - normal(abs(_b[Dis_Step_b]/_se[Dis_Step_b]))) as txt ")"
+  Non-Tech PPML Step Jump (delta):   1.3274 (SE =  0.3364, p = 0.0001)
+
+.     di as txt "  Non-Tech PPML Slope Accel (kappa):" as res %7.4f _b[Dis_Slope_b]     as txt " (SE = " as res %7.4f _se[Dis_Slope_b]     as txt
+>  ", p = " as res %6.4f 2*(1 - normal(abs(_b[Dis_Slope_b]/_se[Dis_Slope_b]))) as txt ")"
+  Non-Tech PPML Slope Accel (kappa): 0.0218 (SE =  0.0359, p = 0.5440)
+
+.     
+.     test Dis_Step_b Dis_Slope_b
+
+ ( 1)  Dis_Step_b = 0
+ ( 2)  Dis_Slope_b = 0
+
+           chi2(  2) =   15.57
+         Prob > chi2 =    0.0004
+
+.     di as txt "  Joint Wald Test (delta = 0 & kappa = 0): chi2(2) = " as res %5.2f r(chi2) as txt ", p = " as res %8.6f r(p)
+  Joint Wald Test (delta = 0 & kappa = 0): chi2(2) = 15.57, p = 0.000415
+
+.     
+.     * Two-way clustering
+.     ppmlhdfe trade_value_m_usd Dis_trend_lin_b Dis_Early_b Dis_Step_b Dis_Slope_b, ///
+>         absorb(partner_sector_b sector_period_b partner_period_b) ///
+>         vce(cluster partner_iso sector)
+(dropped 375 observations that are either singletons or separated by a fixed effect)
+Iteration 1:   deviance = 2.8146e+05  eps = .         iters = 6    tol = 1.0e-04  min(eta) =  -3.51  P   
+Iteration 2:   deviance = 9.5468e+04  eps = 1.95e+00  iters = 6    tol = 1.0e-04  min(eta) =  -4.82      
+Iteration 3:   deviance = 5.6192e+04  eps = 6.99e-01  iters = 5    tol = 1.0e-04  min(eta) =  -6.14      
+Iteration 4:   deviance = 4.5827e+04  eps = 2.26e-01  iters = 4    tol = 1.0e-04  min(eta) =  -7.61      
+Iteration 5:   deviance = 4.3117e+04  eps = 6.29e-02  iters = 4    tol = 1.0e-04  min(eta) =  -8.85      
+Iteration 6:   deviance = 4.2419e+04  eps = 1.64e-02  iters = 4    tol = 1.0e-04  min(eta) =  -9.76      
+Iteration 7:   deviance = 4.2242e+04  eps = 4.19e-03  iters = 3    tol = 1.0e-04  min(eta) = -10.93      
+Iteration 8:   deviance = 4.2198e+04  eps = 1.05e-03  iters = 2    tol = 1.0e-04  min(eta) = -12.09      
+Iteration 9:   deviance = 4.2187e+04  eps = 2.48e-04  iters = 2    tol = 1.0e-04  min(eta) = -13.79      
+Iteration 10:  deviance = 4.2185e+04  eps = 5.05e-05  iters = 2    tol = 1.0e-04  min(eta) = -15.55      
+Iteration 11:  deviance = 4.2185e+04  eps = 9.19e-06  iters = 2    tol = 1.0e-05  min(eta) = -17.18      
+Iteration 12:  deviance = 4.2185e+04  eps = 1.51e-06  iters = 2    tol = 1.0e-06  min(eta) = -18.38   S  
+Iteration 13:  deviance = 4.2185e+04  eps = 1.98e-07  iters = 2    tol = 1.0e-06  min(eta) = -19.02   S  
+Iteration 14:  deviance = 4.2185e+04  eps = 1.46e-08  iters = 2    tol = 1.0e-07  min(eta) = -19.23   S  
+Iteration 15:  deviance = 4.2185e+04  eps = 2.83e-10  iters = 2    tol = 1.0e-08  min(eta) = -19.25   S  
+Iteration 16:  deviance = 4.2185e+04  eps = 2.66e-13  iters = 2    tol = 1.0e-09  min(eta) = -19.25   S O
+------------------------------------------------------------------------------------------------------------
+(legend: p: exact partial-out   s: exact solver   h: step-halving   o: epsilon below tolerance)
+Converged in 16 iterations and 50 HDFE sub-iterations (tol = 1.0e-08)
+
+HDFE PPML regression                              No. of obs      =     27,921
+Absorbing 3 HDFE groups                           Residual df     =          5
+Statistics robust to heteroskedasticity           Wald chi2(4)    =      83.88
+Deviance             =  42184.74833               Prob > chi2     =     0.0000
+Log pseudolikelihood = -64140.17485               Pseudo R2       =     0.9696
+
+Number of clusters (partner_iso)=         6
+Number of clusters (sector) =        131
+                        (Std. err. adjusted for 6 clusters in partner_iso sector)
+---------------------------------------------------------------------------------
+                |               Robust
+trade_value_m~d | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+----------------+----------------------------------------------------------------
+Dis_trend_lin_b |   -.006771   .0066966    -1.01   0.312    -.0198961    .0063541
+    Dis_Early_b |   1.211505   .2259222     5.36   0.000     .7687054    1.654304
+     Dis_Step_b |   1.327383   .4123195     3.22   0.001     .5192513    2.135514
+    Dis_Slope_b |   .0217991     .03319     0.66   0.511    -.0432521    .0868503
+          _cons |   5.431302   .0186949   290.52   0.000      5.39466    5.467943
+---------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+----------------------------------------------------------+
+      Absorbed FE | Categories  - Redundant  = Num. Coefs |
+------------------+---------------------------------------|
+ partner_sector_b |       778         778           0    *|
+  sector_period_b |      4698        4698           0    *|
+ partner_period_b |       216         216           0    *|
+----------------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+.     di as txt "  Non-Tech PPML Two-Way SE on Step Jump: [SE = " as res %7.4f _se[Dis_Step_b] as txt "], p = " as res %6.4f 2*ttail(5, abs(_b[Di
+> s_Step_b]/_se[Dis_Step_b]))
+  Non-Tech PPML Two-Way SE on Step Jump: [SE =  0.4123], p = 0.0235
 
 . restore
 
-. 
 . 
 . * ==============================================================================
 . * PART 3: MARCH 2025 ANTICIPATORY STOCKPILING SENSITIVITY (TABLE 4 PANEL B)
@@ -868,13 +982,41 @@ PART 3: MARCH 2025 ANTICIPATORY STOCKPILING IMPULSE DUMMY IN RDiT SPLINES
 
 .     gen double Dis_Slope_p = Dis_p * t_centered_p * d_post_p
 
+.     cap drop log_val_p
+
 .     cap confirm variable trade_value_m_usd
 
 .     if _rc != 0 {
-.         cap gen double trade_value_m_usd = val_usd / 1000000
+.         cap confirm variable val_usd
+.         if _rc == 0 gen double trade_value_m_usd = val_usd / 1000000
+.         else {
+.             cap confirm variable trade_value_usd
+.             if _rc == 0 gen double trade_value_m_usd = trade_value_usd / 1000000
+.             else {
+.                 cap confirm variable primaryvalue
+.                 if _rc == 0 gen double trade_value_m_usd = primaryvalue / 1000000
+.             }
+.         }
 .     }
 
-.     gen double log_val_p = ln(max(trade_value_m_usd, 0.001))
+.     cap drop log_val_p
+
+.     cap confirm variable trade_value_m_usd
+
+.     if _rc != 0 {
+.         cap confirm variable val_usd
+.         if _rc == 0 gen double trade_value_m_usd = val_usd / 1000000
+.         else {
+.             cap confirm variable trade_value_usd
+.             if _rc == 0 gen double trade_value_m_usd = trade_value_usd / 1000000
+.             else {
+.                 cap confirm variable primaryvalue
+.                 if _rc == 0 gen double trade_value_m_usd = primaryvalue / 1000000
+.             }
+.         }
+.     }
+
+.     gen double log_val_p = ln(trade_value_m_usd) if trade_value_m_usd > 0 & !missing(trade_value_m_usd)
 
 .     egen ps_p = group(partner_iso sector)
 
@@ -883,27 +1025,60 @@ PART 3: MARCH 2025 ANTICIPATORY STOCKPILING IMPULSE DUMMY IN RDiT SPLINES
 .     egen pp_p = group(partner_iso t_p)
 
 . 
-.     cap reghdfe log_val_p Dis_March_p Dis_trend_lin_p Dis_Early_p Dis_Step_p Dis_Slope_p, ///
+.     reghdfe log_val_p Dis_March_p Dis_trend_lin_p Dis_Early_p Dis_Step_p Dis_Slope_p, ///
 >         absorb(ps_p sp_p pp_p) vce(cluster sector)
+(dropped 80 singleton observations)
+(MWFE estimator converged in 12 iterations)
 
-.     if _rc == 0 {
-.         di as txt "OLS Spline WITH March Dummy:"
-OLS Spline WITH March Dummy:
-.         di as txt "  March Stockpiling Dummy (Dis_March): beta = " as res %7.4f _b[Dis_March_p] as txt " (p = " as res %6.4f 2*(1-norm
-> al(abs(_b[Dis_March_p]/_se[Dis_March_p]))) as txt ")"
-  March Stockpiling Dummy (Dis_March): beta =  0.7100 (p = 0.0509)
-.         di as txt "  Purged Secular Drift (theta_1):       beta = " as res %7.4f _b[Dis_trend_lin_p] as txt " (p = " as res %6.4f 2*(1
-> -normal(abs(_b[Dis_trend_lin_p]/_se[Dis_trend_lin_p]))) as txt ")"
-  Purged Secular Drift (theta_1):       beta =  0.0043 (p = 0.7362)
-.         di as txt "  Statutory Step Jump (delta):          beta = " as res %7.4f _b[Dis_Step_p] as txt " (SE = " as res %7.4f _se[Dis_
-> Step_p] as txt ", p < 0.0001)"
-  Statutory Step Jump (delta):          beta =  1.4904 (SE =  0.3201, p < 0.0001)
-.     }
+HDFE Linear regression                            Number of obs   =     25,544
+Absorbing 3 HDFE groups                           F(   5,    132) =       6.75
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.9519
+                                                  Adj R-squared   =     0.9381
+                                                  Within R-sq.    =     0.0049
+Number of clusters (sector)  =        133         Root MSE        =     0.7022
 
-.     else {
-.         di as txt "Note: OLS with March dummy verified via Python pyfixest feols (Dis_March = 0.7100, p = 0.0530; theta1 = 0.0043, p =
->  0.7367; delta_Early = 1.0494, SE = 0.3425, p = 0.0026; delta_Step = 1.4904, p < 0.0001)."
-.     }
+                                  (Std. err. adjusted for 133 clusters in sector)
+---------------------------------------------------------------------------------
+                |               Robust
+      log_val_p | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+----------------+----------------------------------------------------------------
+    Dis_March_p |    .709963   .3636119     1.95   0.053    -.0092973    1.429223
+Dis_trend_lin_p |   .0043056   .0127796     0.34   0.737    -.0209737    .0295849
+    Dis_Early_p |   1.049425   .3424513     3.06   0.003     .3720219    1.726827
+     Dis_Step_p |   1.490436   .3200806     4.66   0.000     .8572845    2.123587
+    Dis_Slope_p |   .0463093   .0904215     0.51   0.609    -.1325533    .2251718
+          _cons |   1.268474   .0356254    35.61   0.000     1.198004    1.338945
+---------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+        ps_p |       784         784           0    *|
+        sp_p |      4696        4696           0    *|
+        pp_p |       216           1         215     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+.     di as txt "OLS Spline WITH March Dummy (Table 4 Panel B Col 2):"
+OLS Spline WITH March Dummy (Table 4 Panel B Col 2):
+
+.     di as txt "  March Stockpiling Dummy (Dis_March): beta = " as res %7.4f _b[Dis_March_p] as txt " (SE = " as res %7.4f _se[Dis_March_p] as t
+> xt ", p = " as res %6.4f 2*ttail(e(df_r), abs(_b[Dis_March_p]/_se[Dis_March_p])) as txt ")"
+  March Stockpiling Dummy (Dis_March): beta =  0.7100 (SE =  0.3636, p = 0.0530)
+
+.     di as txt "  Grace Period Step Jump (delta_Gr):   beta = " as res %7.4f _b[Dis_Early_p] as txt " (SE = " as res %7.4f _se[Dis_Early_p] as t
+> xt ", p = " as res %6.4f 2*ttail(e(df_r), abs(_b[Dis_Early_p]/_se[Dis_Early_p])) as txt ")"
+  Grace Period Step Jump (delta_Gr):   beta =  1.0494 (SE =  0.3425, p = 0.0026)
+
+.     di as txt "  Statutory Step Jump (delta):          beta = " as res %7.4f _b[Dis_Step_p]  as txt " (SE = " as res %7.4f _se[Dis_Step_p]  as 
+> txt ", p = " as res %6.4f 2*ttail(e(df_r), abs(_b[Dis_Step_p]/_se[Dis_Step_p])) as txt ")"
+  Statutory Step Jump (delta):          beta =  1.4904 (SE =  0.3201, p = 0.0000)
+
+.     di as txt "  Purged Secular Drift (theta_1):       beta = " as res %7.4f _b[Dis_trend_lin_p] as txt " (p = " as res %6.4f 2*ttail(e(df_r), 
+> abs(_b[Dis_trend_lin_p]/_se[Dis_trend_lin_p])) as txt ")"
+  Purged Secular Drift (theta_1):       beta =  0.0043 (p = 0.7367)
 
 . restore
 
@@ -912,6 +1087,21 @@ OLS Spline WITH March Dummy:
 . preserve
 
 .     use "panel_hs84_hs85_balanced_with_zeros.dta", clear
+
+.     cap drop china_share_2022
+
+.     merge m:1 sector using "baseline_china_share_2022.dta", keepusing(china_share_2022)
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                            28,728  (_merge==3)
+    -----------------------------------------
+
+.     keep if _merge == 3
+(0 observations deleted)
+
+.     drop _merge
 
 .     gen int year_b2 = floor(period / 100)
 
@@ -948,27 +1138,346 @@ OLS Spline WITH March Dummy:
 .     egen pp_b2 = group(partner_iso t_b2)
 
 . 
-.     cap ppmlhdfe trade_value_m_usd Dis_March_b2 Dis_trend_lin_b2 Dis_Early_b2 Dis_Step_b2 Dis_Slope_b2, ///
+.     ppmlhdfe trade_value_m_usd Dis_March_b2 Dis_trend_lin_b2 Dis_Early_b2 Dis_Step_b2 Dis_Slope_b2, ///
 >         absorb(ps_b2 sp_b2 pp_b2) vce(cluster sector)
+(dropped 375 observations that are either singletons or separated by a fixed effect)
+Iteration 1:   deviance = 6.0659e+05  eps = .         iters = 5    tol = 1.0e-04  min(eta) =  -3.86  P   
+Iteration 2:   deviance = 2.0809e+05  eps = 1.92e+00  iters = 5    tol = 1.0e-04  min(eta) =  -5.26      
+Iteration 3:   deviance = 1.2696e+05  eps = 6.39e-01  iters = 5    tol = 1.0e-04  min(eta) =  -6.89      
+Iteration 4:   deviance = 1.0602e+05  eps = 1.98e-01  iters = 5    tol = 1.0e-04  min(eta) =  -8.33      
+Iteration 5:   deviance = 1.0054e+05  eps = 5.45e-02  iters = 4    tol = 1.0e-04  min(eta) =  -9.21      
+Iteration 6:   deviance = 9.9122e+04  eps = 1.43e-02  iters = 3    tol = 1.0e-04  min(eta) = -10.07      
+Iteration 7:   deviance = 9.8760e+04  eps = 3.66e-03  iters = 3    tol = 1.0e-04  min(eta) = -11.32      
+Iteration 8:   deviance = 9.8669e+04  eps = 9.20e-04  iters = 3    tol = 1.0e-04  min(eta) = -12.43      
+Iteration 9:   deviance = 9.8647e+04  eps = 2.26e-04  iters = 2    tol = 1.0e-04  min(eta) = -13.78      
+Iteration 10:  deviance = 9.8642e+04  eps = 5.01e-05  iters = 2    tol = 1.0e-04  min(eta) = -15.56      
+Iteration 11:  deviance = 9.8641e+04  eps = 9.53e-06  iters = 2    tol = 1.0e-05  min(eta) = -17.30      
+Iteration 12:  deviance = 9.8641e+04  eps = 1.67e-06  iters = 3    tol = 1.0e-06  min(eta) = -18.72   S  
+Iteration 13:  deviance = 9.8641e+04  eps = 2.51e-07  iters = 2    tol = 1.0e-06  min(eta) = -19.62   S  
+Iteration 14:  deviance = 9.8641e+04  eps = 2.64e-08  iters = 2    tol = 1.0e-07  min(eta) = -20.01   S  
+Iteration 15:  deviance = 9.8641e+04  eps = 1.16e-09  iters = 3    tol = 1.0e-08  min(eta) = -20.09   S O
+------------------------------------------------------------------------------------------------------------
+(legend: p: exact partial-out   s: exact solver   h: step-halving   o: epsilon below tolerance)
+Converged in 15 iterations and 49 HDFE sub-iterations (tol = 1.0e-08)
 
-.     if _rc == 0 {
-.         di as txt "PPML Spline WITH March Dummy:"
-PPML Spline WITH March Dummy:
-.         di as txt "  March Stockpiling Dummy (Dis_March): beta = " as res %7.4f _b[Dis_March_b2] as txt " (p = " as res %6.4f 2*(1-nor
-> mal(abs(_b[Dis_March_b2]/_se[Dis_March_b2]))) as txt ")"
-  March Stockpiling Dummy (Dis_March): beta =  1.5363 (p = 0.0000)
-.         di as txt "  Purged Secular Drift (theta_1):       beta = " as res %7.4f _b[Dis_trend_lin_b2] as txt " (p = " as res %6.4f 2*(
-> 1-normal(abs(_b[Dis_trend_lin_b2]/_se[Dis_trend_lin_b2]))) as txt ")"
+HDFE PPML regression                              No. of obs      =     28,353
+Absorbing 3 HDFE groups                           Residual df     =        132
+Statistics robust to heteroskedasticity           Wald chi2(5)    =     115.12
+Deviance             =   98640.8903               Prob > chi2     =     0.0000
+Log pseudolikelihood = -94230.48819               Pseudo R2       =     0.9793
+
+Number of clusters (sector) =        133
+                                   (Std. err. adjusted for 133 clusters in sector)
+----------------------------------------------------------------------------------
+                 |               Robust
+trade_value_m_~d | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-----------------+----------------------------------------------------------------
+    Dis_March_b2 |   1.536312   .3588223     4.28   0.000     .8330334    2.239591
+Dis_trend_lin_b2 |   .0294543   .0395254     0.75   0.456    -.0480141    .1069226
+    Dis_Early_b2 |   3.278596   .5498021     5.96   0.000     2.201004    4.356188
+     Dis_Step_b2 |   2.891233   .6479501     4.46   0.000     1.621275    4.161192
+    Dis_Slope_b2 |  -.1218404   .0983703    -1.24   0.215    -.3146427    .0709618
+           _cons |   6.299351   .0469916   134.05   0.000     6.207249    6.391452
+----------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       ps_b2 |       790         790           0    *|
+       sp_b2 |      4770        4770           0    *|
+       pp_b2 |       216           1         215     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+.     di as txt "PPML Spline WITH March Dummy (Table 4 Panel B Col 2):"
+PPML Spline WITH March Dummy (Table 4 Panel B Col 2):
+
+.     di as txt "  March Stockpiling Dummy (Dis_March): beta = " as res %7.4f _b[Dis_March_b2] as txt " (SE = " as res %7.4f _se[Dis_March_b2] as
+>  txt ", p = " as res %6.4f 2*(1 - normal(abs(_b[Dis_March_b2]/_se[Dis_March_b2]))) as txt ")"
+  March Stockpiling Dummy (Dis_March): beta =  1.5363 (SE =  0.3588, p = 0.0000)
+
+.     di as txt "  Grace Period Step Jump (delta_Gr):   beta = " as res %7.4f _b[Dis_Early_b2] as txt " (SE = " as res %7.4f _se[Dis_Early_b2] as
+>  txt ", p = " as res %6.4f 2*(1 - normal(abs(_b[Dis_Early_b2]/_se[Dis_Early_b2]))) as txt ")"
+  Grace Period Step Jump (delta_Gr):   beta =  3.2786 (SE =  0.5498, p = 0.0000)
+
+.     di as txt "  Statutory Step Jump (delta):          beta = " as res %7.4f _b[Dis_Step_b2]  as txt " (SE = " as res %7.4f _se[Dis_Step_b2]  a
+> s txt ", p = " as res %6.4f 2*(1 - normal(abs(_b[Dis_Step_b2]/_se[Dis_Step_b2]))) as txt ")"
+  Statutory Step Jump (delta):          beta =  2.8912 (SE =  0.6480, p = 0.0000)
+
+.     di as txt "  Purged Secular Drift (theta_1):       beta = " as res %7.4f _b[Dis_trend_lin_b2] as txt " (p = " as res %6.4f 2*(1 - normal(ab
+> s(_b[Dis_trend_lin_b2]/_se[Dis_trend_lin_b2]))) as txt ")"
   Purged Secular Drift (theta_1):       beta =  0.0295 (p = 0.4562)
-.         di as txt "  Statutory Step Jump (delta):          beta = " as res %7.4f _b[Dis_Step_b2] as txt " (SE = " as res %7.4f _se[Dis
-> _Step_b2] as txt ", p < 0.0001)"
-  Statutory Step Jump (delta):          beta =  2.8912 (SE =  0.6480, p < 0.0001)
+
+. restore
+
+. 
+. * ==============================================================================
+. * PART 3B: FULL THREE-PHASE POLICY SPLINE (TABLE 4 PANEL B COL 3)
+. * ==============================================================================
+. di _newline "========================================================================"
+
+========================================================================
+
+. di "PART 3B: FULL THREE-PHASE POLICY SPLINE (TABLE 4 PANEL B COL 3)"
+PART 3B: FULL THREE-PHASE POLICY SPLINE (TABLE 4 PANEL B COL 3)
+
+. di "========================================================================"
+========================================================================
+
+. * OLS Full Three-Phase Model (Table 4 Panel B Col 3)
+. preserve
+
+.     use `enriched_universe', clear
+
+.     gen int year_p = floor(period / 100)
+
+.     gen byte month_p = mod(period, 100)
+
+.     gen byte t_p = (year_p - 2023)*12 + month_p
+
+.     gen double t_clean_p = t_p - 24
+
+.     gen double t_enf_p   = t_p - 31
+
+.     gen byte ex_china_p = (partner_iso != "CHN")
+
+.     gen double Dis_p = ex_china_p * china_share_2022
+
+.     gen double Dis_trend_p = Dis_p * t_clean_p
+
+.     gen double Dis_Ant_p   = Dis_p * (t_p >= 25 & t_p <= 27)
+
+.     gen double Dis_Gr_p    = Dis_p * (t_p >= 28 & t_p <= 30)
+
+.     gen double Dis_Enf_p   = Dis_p * (t_p >= 31)
+
+.     gen double Dis_Slope_p = Dis_p * t_enf_p * (t_p >= 31)
+
+.     cap drop log_val_p
+
+.     cap confirm variable trade_value_m_usd
+
+.     if _rc != 0 {
+.         cap confirm variable val_usd
+.         if _rc == 0 gen double trade_value_m_usd = val_usd / 1000000
+.         else {
+.             cap confirm variable trade_value_usd
+.             if _rc == 0 gen double trade_value_m_usd = trade_value_usd / 1000000
+.             else {
+.                 cap confirm variable primaryvalue
+.                 if _rc == 0 gen double trade_value_m_usd = primaryvalue / 1000000
+.             }
+.         }
 .     }
 
-.     else {
-.         di as txt "Note: PPML with March dummy verified via Python pyfixest fepois (Dis_March = 1.5363, p < 0.0001; theta1 = 0.0295, p
->  = 0.4579; delta_Early = 3.2786, SE = 0.5519, p < 0.0001; delta_Step = 2.8912, p < 0.0001)."
-.     }
+.     gen double log_val_p = ln(trade_value_m_usd) if trade_value_m_usd > 0 & !missing(trade_value_m_usd)
+
+.     egen ps_p = group(partner_iso sector)
+
+.     egen sp_p = group(sector t_p)
+
+.     egen pp_p = group(partner_iso t_p)
+
+.     reghdfe log_val_p Dis_trend_p Dis_Ant_p Dis_Gr_p Dis_Enf_p Dis_Slope_p, absorb(ps_p sp_p pp_p) vce(cluster sector)
+(dropped 80 singleton observations)
+(MWFE estimator converged in 12 iterations)
+
+HDFE Linear regression                            Number of obs   =     25,544
+Absorbing 3 HDFE groups                           F(   5,    132) =       7.14
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.9519
+                                                  Adj R-squared   =     0.9381
+                                                  Within R-sq.    =     0.0051
+Number of clusters (sector)  =        133         Root MSE        =     0.7022
+
+                               (Std. err. adjusted for 133 clusters in sector)
+------------------------------------------------------------------------------
+             |               Robust
+   log_val_p | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ Dis_trend_p |  -.0061085   .0147481    -0.41   0.679    -.0352816    .0230647
+   Dis_Ant_p |   .7354331   .2895816     2.54   0.012      .162612    1.308254
+    Dis_Gr_p |   1.260737    .378701     3.33   0.001     .5116292    2.009845
+   Dis_Enf_p |   1.722381   .3662965     4.70   0.000     .9978099    2.446951
+ Dis_Slope_p |   .0567398    .090195     0.63   0.530    -.1216748    .2351545
+       _cons |   1.236415   .0285892    43.25   0.000     1.179863    1.292967
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+        ps_p |       784         784           0    *|
+        sp_p |      4696        4696           0    *|
+        pp_p |       216           1         215     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+.     di as txt "OLS Full Three-Phase Model (Table 4 Panel B Col 3):"
+OLS Full Three-Phase Model (Table 4 Panel B Col 3):
+
+.     di as txt "  Secular Exposure Trend (theta_1):     beta = " as res %7.4f _b[Dis_trend_p] as txt " (SE = " as res %7.4f _se[Dis_trend_p] as 
+> txt ", p = " as res %6.4f 2*ttail(e(df_r), abs(_b[Dis_trend_p]/_se[Dis_trend_p])) as txt ")"
+  Secular Exposure Trend (theta_1):     beta = -0.0061 (SE =  0.0147, p = 0.6794)
+
+.     di as txt "  Q1 Anticipation Phase (delta_Ant):    beta = " as res %7.4f _b[Dis_Ant_p]   as txt " (SE = " as res %7.4f _se[Dis_Ant_p]   as 
+> txt ", p = " as res %6.4f 2*ttail(e(df_r), abs(_b[Dis_Ant_p]/_se[Dis_Ant_p])) as txt ")"
+  Q1 Anticipation Phase (delta_Ant):    beta =  0.7354 (SE =  0.2896, p = 0.0123)
+
+.     di as txt "  Transitional Grace Window (delta_Gr): beta = " as res %7.4f _b[Dis_Gr_p]    as txt " (SE = " as res %7.4f _se[Dis_Gr_p]    as 
+> txt ", p = " as res %6.4f 2*ttail(e(df_r), abs(_b[Dis_Gr_p]/_se[Dis_Gr_p])) as txt ")"
+  Transitional Grace Window (delta_Gr): beta =  1.2607 (SE =  0.3787, p = 0.0011)
+
+.     di as txt "  Statutory Step Jump (delta_Enf):      beta = " as res %7.4f _b[Dis_Enf_p]   as txt " (SE = " as res %7.4f _se[Dis_Enf_p]   as 
+> txt ", p = " as res %6.4f 2*ttail(e(df_r), abs(_b[Dis_Enf_p]/_se[Dis_Enf_p])) as txt ")"
+  Statutory Step Jump (delta_Enf):      beta =  1.7224 (SE =  0.3663, p = 0.0000)
+
+.     di as txt "  Slope Acceleration (kappa):           beta = " as res %7.4f _b[Dis_Slope_p] as txt " (SE = " as res %7.4f _se[Dis_Slope_p] as 
+> txt ", p = " as res %6.4f 2*ttail(e(df_r), abs(_b[Dis_Slope_p]/_se[Dis_Slope_p])) as txt ")"
+  Slope Acceleration (kappa):           beta =  0.0567 (SE =  0.0902, p = 0.5304)
+
+.     test Dis_Enf_p = Dis_Gr_p
+
+ ( 1)  - Dis_Gr_p + Dis_Enf_p = 0
+
+       F(  1,   132) =    3.34
+            Prob > F =    0.0698
+
+. restore
+
+. 
+. * PPML Full Three-Phase Model (Table 4 Panel B Col 3)
+. preserve
+
+.     use "panel_hs84_hs85_balanced_with_zeros.dta", clear
+
+.     cap drop china_share_2022
+
+.     merge m:1 sector using "baseline_china_share_2022.dta", keepusing(china_share_2022)
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                            28,728  (_merge==3)
+    -----------------------------------------
+
+.     keep if _merge == 3
+(0 observations deleted)
+
+.     drop _merge
+
+.     gen int year_b3 = floor(period / 100)
+
+.     gen byte month_b3 = mod(period, 100)
+
+.     gen byte t_b3 = (year_b3 - 2023)*12 + month_b3
+
+.     gen double t_clean_b3 = t_b3 - 24
+
+.     gen double t_enf_b3   = t_b3 - 31
+
+.     gen byte ex_china_b3 = (partner_iso != "CHN")
+
+.     gen double Dis_b3 = ex_china_b3 * china_share_2022
+
+.     gen double Dis_trend_b3 = Dis_b3 * t_clean_b3
+
+.     gen double Dis_Ant_b3   = Dis_b3 * (t_b3 >= 25 & t_b3 <= 27)
+
+.     gen double Dis_Gr_b3    = Dis_b3 * (t_b3 >= 28 & t_b3 <= 30)
+
+.     gen double Dis_Enf_b3   = Dis_b3 * (t_b3 >= 31)
+
+.     gen double Dis_Slope_b3 = Dis_b3 * t_enf_b3 * (t_b3 >= 31)
+
+.     egen ps_b3 = group(partner_iso sector)
+
+.     egen sp_b3 = group(sector t_b3)
+
+.     egen pp_b3 = group(partner_iso t_b3)
+
+.     ppmlhdfe trade_value_m_usd Dis_trend_b3 Dis_Ant_b3 Dis_Gr_b3 Dis_Enf_b3 Dis_Slope_b3, ///
+>         absorb(ps_b3 sp_b3 pp_b3) vce(cluster sector)
+(dropped 375 observations that are either singletons or separated by a fixed effect)
+Iteration 1:   deviance = 6.0651e+05  eps = .         iters = 5    tol = 1.0e-04  min(eta) =  -3.86  P   
+Iteration 2:   deviance = 2.0792e+05  eps = 1.92e+00  iters = 5    tol = 1.0e-04  min(eta) =  -5.22      
+Iteration 3:   deviance = 1.2678e+05  eps = 6.40e-01  iters = 5    tol = 1.0e-04  min(eta) =  -6.84      
+Iteration 4:   deviance = 1.0583e+05  eps = 1.98e-01  iters = 5    tol = 1.0e-04  min(eta) =  -8.28      
+Iteration 5:   deviance = 1.0036e+05  eps = 5.46e-02  iters = 4    tol = 1.0e-04  min(eta) =  -9.16      
+Iteration 6:   deviance = 9.8940e+04  eps = 1.43e-02  iters = 3    tol = 1.0e-04  min(eta) = -10.06      
+Iteration 7:   deviance = 9.8579e+04  eps = 3.67e-03  iters = 3    tol = 1.0e-04  min(eta) = -11.31      
+Iteration 8:   deviance = 9.8488e+04  eps = 9.22e-04  iters = 3    tol = 1.0e-04  min(eta) = -12.41      
+Iteration 9:   deviance = 9.8466e+04  eps = 2.26e-04  iters = 2    tol = 1.0e-04  min(eta) = -13.84      
+Iteration 10:  deviance = 9.8461e+04  eps = 5.02e-05  iters = 2    tol = 1.0e-04  min(eta) = -15.70      
+Iteration 11:  deviance = 9.8460e+04  eps = 9.55e-06  iters = 2    tol = 1.0e-05  min(eta) = -17.46      
+Iteration 12:  deviance = 9.8460e+04  eps = 1.67e-06  iters = 3    tol = 1.0e-06  min(eta) = -18.90   S  
+Iteration 13:  deviance = 9.8460e+04  eps = 2.51e-07  iters = 2    tol = 1.0e-06  min(eta) = -19.83   S  
+Iteration 14:  deviance = 9.8460e+04  eps = 2.65e-08  iters = 2    tol = 1.0e-07  min(eta) = -20.22   S  
+Iteration 15:  deviance = 9.8460e+04  eps = 1.17e-09  iters = 3    tol = 1.0e-08  min(eta) = -20.31   S O
+------------------------------------------------------------------------------------------------------------
+(legend: p: exact partial-out   s: exact solver   h: step-halving   o: epsilon below tolerance)
+Converged in 15 iterations and 49 HDFE sub-iterations (tol = 1.0e-08)
+
+HDFE PPML regression                              No. of obs      =     28,353
+Absorbing 3 HDFE groups                           Residual df     =        132
+Statistics robust to heteroskedasticity           Wald chi2(5)    =     215.38
+Deviance             =  98459.70865               Prob > chi2     =     0.0000
+Log pseudolikelihood = -94139.89737               Pseudo R2       =     0.9793
+
+Number of clusters (sector) =        133
+                               (Std. err. adjusted for 133 clusters in sector)
+------------------------------------------------------------------------------
+             |               Robust
+trade_valu~d | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+Dis_trend_b3 |   .0144848   .0445072     0.33   0.745    -.0727478    .1017173
+  Dis_Ant_b3 |    1.22083   .1985574     6.15   0.000      .831665    1.609996
+   Dis_Gr_b3 |   3.580076   .5663639     6.32   0.000     2.470023    4.690129
+  Dis_Enf_b3 |   3.224048   .5970971     5.40   0.000      2.05376    4.394337
+Dis_Slope_b3 |  -.1068188   .0944671    -1.13   0.258     -.291971    .0783334
+       _cons |   6.203611   .0374295   165.74   0.000      6.13025    6.276971
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       ps_b3 |       790         790           0    *|
+       sp_b3 |      4770        4770           0    *|
+       pp_b3 |       216           1         215     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+.     di as txt "PPML Full Three-Phase Model (Table 4 Panel B Col 3):"
+PPML Full Three-Phase Model (Table 4 Panel B Col 3):
+
+.     di as txt "  Secular Exposure Trend (theta_1):     beta = " as res %7.4f _b[Dis_trend_b3] as txt " (SE = " as res %7.4f _se[Dis_trend_b3] a
+> s txt ", p = " as res %6.4f 2*(1 - normal(abs(_b[Dis_trend_b3]/_se[Dis_trend_b3]))) as txt ")"
+  Secular Exposure Trend (theta_1):     beta =  0.0145 (SE =  0.0445, p = 0.7448)
+
+.     di as txt "  Q1 Anticipation Phase (delta_Ant):    beta = " as res %7.4f _b[Dis_Ant_b3]   as txt " (SE = " as res %7.4f _se[Dis_Ant_b3]   a
+> s txt ", p = " as res %6.4f 2*(1 - normal(abs(_b[Dis_Ant_b3]/_se[Dis_Ant_b3]))) as txt ")"
+  Q1 Anticipation Phase (delta_Ant):    beta =  1.2208 (SE =  0.1986, p = 0.0000)
+
+.     di as txt "  Transitional Grace Window (delta_Gr): beta = " as res %7.4f _b[Dis_Gr_b3]    as txt " (SE = " as res %7.4f _se[Dis_Gr_b3]    a
+> s txt ", p = " as res %6.4f 2*(1 - normal(abs(_b[Dis_Gr_b3]/_se[Dis_Gr_b3]))) as txt ")"
+  Transitional Grace Window (delta_Gr): beta =  3.5801 (SE =  0.5664, p = 0.0000)
+
+.     di as txt "  Statutory Step Jump (delta_Enf):      beta = " as res %7.4f _b[Dis_Enf_b3]   as txt " (SE = " as res %7.4f _se[Dis_Enf_b3]   a
+> s txt ", p = " as res %6.4f 2*(1 - normal(abs(_b[Dis_Enf_b3]/_se[Dis_Enf_b3]))) as txt ")"
+  Statutory Step Jump (delta_Enf):      beta =  3.2240 (SE =  0.5971, p = 0.0000)
+
+.     di as txt "  Slope Acceleration (kappa):           beta = " as res %7.4f _b[Dis_Slope_b3] as txt " (SE = " as res %7.4f _se[Dis_Slope_b3] a
+> s txt ", p = " as res %6.4f 2*(1 - normal(abs(_b[Dis_Slope_b3]/_se[Dis_Slope_b3]))) as txt ")"
+  Slope Acceleration (kappa):           beta = -0.1068 (SE =  0.0945, p = 0.2582)
+
+.     test Dis_Enf_b3 = Dis_Gr_b3
+
+ ( 1)  - Dis_Gr_b3 + Dis_Enf_b3 = 0
+
+           chi2(  1) =    0.93
+         Prob > chi2 =    0.3349
 
 . restore
 
@@ -1001,10 +1510,19 @@ PART 4: 36-MONTH EVENT-STUDY TRAJECTORY (35 PERIODS, N = 25,544, REF: 2025M03)
 .     cap confirm variable trade_value_m_usd
 
 .     if _rc != 0 {
-.         cap gen double trade_value_m_usd = val_usd / 1000000
+.         cap confirm variable val_usd
+.         if _rc == 0 gen double trade_value_m_usd = val_usd / 1000000
+.         else {
+.             cap confirm variable trade_value_usd
+.             if _rc == 0 gen double trade_value_m_usd = trade_value_usd / 1000000
+.             else {
+.                 cap confirm variable primaryvalue
+.                 if _rc == 0 gen double trade_value_m_usd = primaryvalue / 1000000
+.             }
+.         }
 .     }
 
-.     gen double log_val = ln(max(trade_value_m_usd, 0.001))
+.     gen double log_val = ln(trade_value_m_usd) if trade_value_m_usd > 0 & !missing(trade_value_m_usd)
 
 .     foreach v in ps sp pp {
   2.         cap drop `v'
@@ -1017,34 +1535,185 @@ PART 4: 36-MONTH EVENT-STUDY TRAJECTORY (35 PERIODS, N = 25,544, REF: 2025M03)
 .     egen pp = group(partner_iso period)
 
 .     
-.     * Generate dynamic interaction terms (omitting 202503)
+.     * Generate dynamic interaction terms (omitting reference period 202503)
 .     qui levelsof period, local(p_levels)
 
 .     local ev_vars ""
 
+.     local pre_sum ""
+
+.     local post_sum ""
+
 .     foreach p of local p_levels {
   2.         if `p' != 202503 {
-  3.             qui gen double ev_`p' = Dis * (period == `p')
+  3.             gen double ev_`p' = Dis * (period == `p')
   4.             local ev_vars "`ev_vars' ev_`p'"
-  5.         }
-  6.     }
+  5.             if `p' < 202503 {
+  6.                 if "`pre_sum'" == "" local pre_sum "ev_`p'"
+  7.                 else local pre_sum "`pre_sum' + ev_`p'"
+  8.             }
+  9.             else if `p' > 202503 {
+ 10.                 if "`post_sum'" == "" local post_sum "ev_`p'"
+ 11.                 else local post_sum "`post_sum' + ev_`p'"
+ 12.             }
+ 13.         }
+ 14.     }
 
-.     cap reghdfe log_val `ev_vars', absorb(ps sp pp) vce(cluster sector)
+.     
+.     * Dynamic event-study regression with sector clustering (unsuppressed reporting)
+.     reghdfe log_val `ev_vars', absorb(ps sp pp) vce(cluster sector)
+(dropped 80 singleton observations)
+(MWFE estimator converged in 12 iterations)
 
-.     if _rc == 0 {
-.         di as txt "Dynamic Event Study Estimated (Reference: 202503):"
-Dynamic Event Study Estimated (Reference: 202503):
-.         di as txt "  Pre-Treatment Leads Mean (26 periods): -0.7669"
-  Pre-Treatment Leads Mean (26 periods): -0.7669
-.         di as txt "  Post-Treatment Lags Mean (9 periods):  +0.7321"
-  Post-Treatment Lags Mean (9 periods):  +0.7321
-.         di as txt "  Net Dynamic Shift (Post - Pre):        +1.4990 log points (p < 0.0001)"
-  Net Dynamic Shift (Post - Pre):        +1.4990 log points (p < 0.0001)
-.     }
+HDFE Linear regression                            Number of obs   =     25,544
+Absorbing 3 HDFE groups                           F(  35,    132) =       3.41
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.9520
+                                                  Adj R-squared   =     0.9381
+                                                  Within R-sq.    =     0.0057
+Number of clusters (sector)  =        133         Root MSE        =     0.7025
 
-.     else {
-.         di as txt "Note: Event study verified via Python pyfixest feols (36 periods, net shift = +1.4990, p < 0.0001)."
-.     }
+                               (Std. err. adjusted for 133 clusters in sector)
+------------------------------------------------------------------------------
+             |               Robust
+     log_val | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   ev_202301 |  -1.075473   .4605536    -2.34   0.021    -1.986494   -.1644526
+   ev_202302 |  -.8685954   .4520333    -1.92   0.057    -1.762762    .0255712
+   ev_202303 |  -.4820641   .4194096    -1.15   0.252    -1.311698    .3475695
+   ev_202304 |  -.6039305    .471753    -1.28   0.203    -1.537105    .3292435
+   ev_202305 |  -.8619525   .4720086    -1.83   0.070    -1.795632    .0717271
+   ev_202306 |  -.5902909   .4416917    -1.34   0.184    -1.464001     .283419
+   ev_202307 |   -.611724   .4322102    -1.42   0.159    -1.466679    .2432306
+   ev_202308 |  -1.123995   .4487859    -2.50   0.013    -2.011738   -.2362522
+   ev_202309 |  -.8749454   .4179211    -2.09   0.038    -1.701635   -.0482562
+   ev_202310 |  -.6038511     .42049    -1.44   0.153    -1.435622    .2279195
+   ev_202311 |  -1.376014   .4226578    -3.26   0.001    -2.212073   -.5399548
+   ev_202312 |  -.2684471   .4767511    -0.56   0.574    -1.211508    .6746137
+   ev_202401 |  -.5174288   .4536553    -1.14   0.256    -1.414804    .3799461
+   ev_202402 |  -.8328188   .5010012    -1.66   0.099    -1.823849    .1582111
+   ev_202403 |  -.5490991   .4096552    -1.34   0.182    -1.359438    .2612393
+   ev_202404 |  -.7027156   .3999457    -1.76   0.081    -1.493848    .0884166
+   ev_202405 |  -1.062496   .4408186    -2.41   0.017    -1.934478    -.190513
+   ev_202406 |  -.9613949    .482323    -1.99   0.048    -1.915477   -.0073123
+   ev_202407 |  -.7851639   .4839767    -1.62   0.107    -1.742518    .1721898
+   ev_202408 |   -.939289   .4042928    -2.32   0.022     -1.73902   -.1395579
+   ev_202409 |  -1.080202   .4986136    -2.17   0.032    -2.066509   -.0938949
+   ev_202410 |  -1.195918   .5049601    -2.37   0.019    -2.194779   -.1970572
+   ev_202411 |  -.8294858   .3577442    -2.32   0.022    -1.537139   -.1218324
+   ev_202412 |  -.6650301    .352976    -1.88   0.062    -1.363252    .0331913
+   ev_202501 |  -.1315043   .3193674    -0.41   0.681    -.7632446    .5002359
+   ev_202502 |  -.3462545   .3876252    -0.89   0.373    -1.113016    .4205065
+   ev_202504 |   .1905544   .3253293     0.59   0.559    -.4529792     .834088
+   ev_202505 |   .1759684   .3138803     0.56   0.576    -.4449179    .7968547
+   ev_202506 |   .6762048   .4151965     1.63   0.106     -.145095    1.497505
+   ev_202507 |   1.105532   .3680965     3.00   0.003     .3774002    1.833663
+   ev_202508 |   .3615718   .4449948     0.81   0.418    -.5186719    1.241816
+   ev_202509 |   1.074726   .5125132     2.10   0.038     .0609241    2.088528
+   ev_202510 |   .8346464   .4526283     1.84   0.067     -.060697     1.72999
+   ev_202511 |   1.112495   .5032787     2.21   0.029     .1169598     2.10803
+   ev_202512 |   1.057313   .4826519     2.19   0.030     .1025803    2.012047
+       _cons |   1.385829   .0546911    25.34   0.000     1.277645    1.494013
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+          ps |       784         784           0    *|
+          sp |      4696        4696           0    *|
+          pp |       216           1         215     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+.     
+.     di as txt _newline ">>> TABLE 4 PANEL A: DYNAMIC EVENT-STUDY WINDOW ESTIMATES <<<"
+
+>>> TABLE 4 PANEL A: DYNAMIC EVENT-STUDY WINDOW ESTIMATES <<<
+
+.     
+.     * Pre-treatment average across all 27 pre-period months (including reference month 2025M03 where beta = 0)
+.     lincom (`pre_sum') / 27
+
+ ( 1)  .037037*ev_202301 + .037037*ev_202302 + .037037*ev_202303 + .037037*ev_202304 + .037037*ev_202305 + .037037*ev_202306 + .037037*ev_202307
+       + .037037*ev_202308 + .037037*ev_202309 + .037037*ev_202310 + .037037*ev_202311 + .037037*ev_202312 + .037037*ev_202401 +
+       .037037*ev_202402 + .037037*ev_202403 + .037037*ev_202404 + .037037*ev_202405 + .037037*ev_202406 + .037037*ev_202407 + .037037*ev_202408
+       + .037037*ev_202409 + .037037*ev_202410 + .037037*ev_202411 + .037037*ev_202412 + .037037*ev_202501 + .037037*ev_202502 = 0
+
+------------------------------------------------------------------------------
+     log_val | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         (1) |  -.7385216   .3476183    -2.12   0.035    -1.426145   -.0508983
+------------------------------------------------------------------------------
+
+.     local pre_mean = r(estimate)
+
+.     local pre_se = r(se)
+
+.     local pre_t = `pre_mean' / `pre_se'
+
+.     local pre_p = 2 * ttail(r(df), abs(`pre_t'))
+
+.     di as txt "  Pre-Treatment Leads Mean (27 periods): " as res %7.4f `pre_mean' as txt " (SE = " as res %7.4f `pre_se' as txt ", t = " as res
+>  %5.2f `pre_t' as txt ", p = " as res %6.4f `pre_p' as txt ")"
+  Pre-Treatment Leads Mean (27 periods): -0.7385 (SE =  0.3476, t = -2.12, p = 0.0355)
+
+.     
+.     * Post-treatment average across 9 lags (2025M04 to 2025M12)
+.     lincom (`post_sum') / 9
+
+ ( 1)  .1111111*ev_202504 + .1111111*ev_202505 + .1111111*ev_202506 + .1111111*ev_202507 + .1111111*ev_202508 + .1111111*ev_202509 +
+       .1111111*ev_202510 + .1111111*ev_202511 + .1111111*ev_202512 = 0
+
+------------------------------------------------------------------------------
+     log_val | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         (1) |   .7321124   .3429765     2.13   0.035     .0536709    1.410554
+------------------------------------------------------------------------------
+
+.     local post_mean = r(estimate)
+
+.     local post_se = r(se)
+
+.     local post_t = `post_mean' / `post_se'
+
+.     local post_p = 2 * ttail(r(df), abs(`post_t'))
+
+.     di as txt "  Post-Treatment Lags Mean (9 periods):  " as res %7.4f `post_mean' as txt " (SE = " as res %7.4f `post_se' as txt ", t = " as r
+> es %5.2f `post_t' as txt ", p = " as res %6.4f `post_p' as txt ")"
+  Post-Treatment Lags Mean (9 periods):   0.7321 (SE =  0.3430, t =  2.13, p = 0.0346)
+
+.     
+.     * Net dynamic shift (Post - Pre)
+.     lincom (`post_sum') / 9 - (`pre_sum') / 27
+
+ ( 1)  - .037037*ev_202301 - .037037*ev_202302 - .037037*ev_202303 - .037037*ev_202304 - .037037*ev_202305 - .037037*ev_202306 -
+       .037037*ev_202307 - .037037*ev_202308 - .037037*ev_202309 - .037037*ev_202310 - .037037*ev_202311 - .037037*ev_202312 - .037037*ev_202401
+       - .037037*ev_202402 - .037037*ev_202403 - .037037*ev_202404 - .037037*ev_202405 - .037037*ev_202406 - .037037*ev_202407 -
+       .037037*ev_202408 - .037037*ev_202409 - .037037*ev_202410 - .037037*ev_202411 - .037037*ev_202412 - .037037*ev_202501 - .037037*ev_202502
+       + .1111111*ev_202504 + .1111111*ev_202505 + .1111111*ev_202506 + .1111111*ev_202507 + .1111111*ev_202508 + .1111111*ev_202509 +
+       .1111111*ev_202510 + .1111111*ev_202511 + .1111111*ev_202512 = 0
+
+------------------------------------------------------------------------------
+     log_val | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         (1) |   1.470634   .2888768     5.09   0.000     .8992072    2.042061
+------------------------------------------------------------------------------
+
+.     local shift_est = r(estimate)
+
+.     local shift_se = r(se)
+
+.     local shift_t = `shift_est' / `shift_se'
+
+.     local shift_p = 2 * ttail(r(df), abs(`shift_t'))
+
+.     di as txt "  Net Dynamic Shift (Post - Pre):        " as res %7.4f `shift_est' as txt " (SE = " as res %7.4f `shift_se' as txt ", t = " as 
+> res %5.2f `shift_t' as txt ", p = " as res %6.4f `shift_p' as txt ")"
+  Net Dynamic Shift (Post - Pre):         1.4706 (SE =  0.2889, t =  5.09, p = 0.0000)
+
+.     di as txt "  Note: Pre-mean (-0.7385) accounts for omitted 2025M03 (beta=0); net dynamic shift (+1.4706) recovers baseline DiD (1.4720)."
+  Note: Pre-mean (-0.7385) accounts for omitted 2025M03 (beta=0); net dynamic shift (+1.4706) recovers baseline DiD (1.4720).
 
 . restore
 
@@ -1053,15 +1722,15 @@ Dynamic Event Study Estimated (Reference: 202503):
 
 ========================================================================
 
-. di "CONCLUSION: RDiT SPLINE ESTIMATION COMPLETE & CERTIFIED"
-CONCLUSION: RDiT SPLINE ESTIMATION COMPLETE & CERTIFIED
+. di "RDiT SPLINE ESTIMATION COMPLETE"
+RDiT SPLINE ESTIMATION COMPLETE
 
 . di "========================================================================"
 ========================================================================
 
 . log close
       name:  <unnamed>
-       log:  C:\Users\Zer0\Desktop\dd\final\replication_package\data\stata\../../results/rdit_splines_log.txt
+       log:  c:\Users\Zer0\Desktop\dd\replication_package\data\stata\../../results/rdit_splines_log.txt
   log type:  text
- closed on:  19 Sep 2026, 00:18:20
-----------------------------------------------------------------------------------------------------------------------------------------
+ closed on:  13 Nov 2026, 02:01:44
+-------------------------------------------------------------------------------------------------------------------------------------------------
